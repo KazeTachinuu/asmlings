@@ -35,7 +35,8 @@ echo $?                              # Check exit code
 
 ## Resources
 
-- [ASM-101.pdf](docs/ASM-101.pdf) - Comprehensive x86-64 assembly guide included in this repo
+- [ASM-101 (English)](docs/ASM-101-EN.pdf) - Comprehensive x86-64 assembly guide
+- [ASM-101 (Français)](docs/ASM-101-FR.pdf) - Guide complet d'assembleur x86-64
 - [Syscall Table](https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)
 - [x86-64 Registers](https://wiki.osdev.org/CPU_Registers_x86-64)
 
