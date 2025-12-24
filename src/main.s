@@ -29,24 +29,7 @@ _start:
     test al, al
     jnz .do_hint
 
-    lea rdi, [rip + cmd_help_str]
-    mov rsi, r12
-    call str_equals
-    test al, al
-    jnz .do_help
-
-    lea rdi, [rip + cmd_help_short]
-    mov rsi, r12
-    call str_equals
-    test al, al
-    jnz .do_help
-
-    lea rdi, [rip + cmd_help_long]
-    mov rsi, r12
-    call str_equals
-    test al, al
-    jnz .do_help
-
+    # Unknown command - show help
     jmp .do_help
 
 .do_list:
@@ -65,7 +48,6 @@ _start:
 
 .do_help:
     call cmd_help
-    jmp .exit_success
 
 .exit_success:
     mov rax, SYS_EXIT

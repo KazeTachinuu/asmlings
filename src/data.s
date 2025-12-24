@@ -19,14 +19,10 @@ marker_not_done:    .asciz "I AM NOT DONE"
 # Terminal control
 clear_screen:       .asciz "\033[2J\033[H"
 
-# Colors
+# Colors (only used ones)
 color_reset:        .asciz "\033[0m"
-color_red:          .asciz "\033[91m"
 color_green:        .asciz "\033[92m"
 color_yellow:       .asciz "\033[93m"
-color_cyan:         .asciz "\033[96m"
-color_dim:          .asciz "\033[2m"
-color_bold:         .asciz "\033[1m"
 
 # Banner
 banner:
@@ -44,7 +40,6 @@ banner:
 # Messages
 msg_watching:       .asciz "\033[2mWatching for changes... (Ctrl+C to quit)\033[0m\n"
 msg_checking:       .asciz "Checking \033[1m"
-msg_compiling:      .asciz "\033[2mCompiling...\033[0m\n"
 msg_passed:         .asciz "\033[92m✓ Exercise passed!\033[0m\n"
 msg_failed:         .asciz "\033[91m✗ Compilation failed\033[0m\n"
 msg_wrong_exit:     .asciz "\033[91m✗ Wrong exit code: got "
@@ -68,7 +63,6 @@ msg_hint_tip:       .asciz "\033[2mRun './asmlings hint' for help.\033[0m\n\n"
 
 # Symbols
 symbol_check:       .asciz "✓"
-symbol_arrow:       .asciz ">"
 
 # Progress bar
 progress_filled:    .asciz "\033[92m█\033[0m"
@@ -86,9 +80,9 @@ sleeptime:
 
 .align 8
 dirent_buffer:      .skip DIRENT_BUFFER_SIZE
-source_buffer:      .skip 65536
-hint_buffer:        .skip 2048
-hint_path_buf:      .skip 64
+source_buffer:      .skip SOURCE_BUFFER_SIZE
+hint_buffer:        .skip HINT_BUFFER_SIZE
+hint_path_buf:      .skip 16
 
 .align 8
 exercises:          .skip MAX_EXERCISES * EXERCISE_SIZE

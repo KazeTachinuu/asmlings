@@ -32,9 +32,7 @@ print_newline:
 
 # Print number in rdi (base 10)
 print_number:
-    push rbp
-    mov rbp, rsp
-    sub rsp, 32
+    sub rsp, 24
     mov rax, rdi
     lea rdi, [rsp + 20]
     mov byte ptr [rdi], 0
@@ -57,6 +55,5 @@ print_number:
 .pn_print:
     inc rdi
     call print_str
-    add rsp, 32
-    pop rbp
+    add rsp, 24
     ret

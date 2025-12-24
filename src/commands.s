@@ -3,19 +3,13 @@
 cmd_list_str:       .asciz "list"
 cmd_watch_str:      .asciz "watch"
 cmd_hint_str:       .asciz "hint"
-cmd_help_str:       .asciz "help"
-cmd_help_short:     .asciz "-h"
-cmd_help_long:      .asciz "--help"
 
 # List all exercises with their status
 cmd_list:
-    push rbp
-    mov rbp, rsp
     push rbx
     push r12
     push r13
     push r14
-    sub rsp, 8
 
     call print_banner
     call load_exercises
@@ -85,24 +79,19 @@ cmd_list:
     call print_progress_bar
 
 .list_exit:
-    add rsp, 8
     pop r14
     pop r13
     pop r12
     pop rbx
-    pop rbp
     ret
 
 # Watch mode - main learning loop
 cmd_watch:
-    push rbp
-    mov rbp, rsp
     push rbx
     push r12
     push r13
     push r14
     push r15
-    sub rsp, 24
 
     call load_exercises
 
@@ -310,12 +299,11 @@ cmd_watch:
     jmp .watch_loop
 
 .watch_next_event:
-    # Move to next event
+    # Move to next event: sizeof(inotify_event) = 16 + len
     lea rdi, [rip + inotify_buffer]
     add rdi, r12
-    movzx eax, word ptr [rdi + 12]  # name length
-    add r12, 16
-    add r12, rax
+    mov eax, [rdi + 12]             # len (dword)
+    lea r12, [r12 + rax + 16]
     jmp .watch_process_event
 
 .watch_event_done:
@@ -336,19 +324,15 @@ cmd_watch:
     call print_str
 
 .watch_exit:
-    add rsp, 24
     pop r15
     pop r14
     pop r13
     pop r12
     pop rbx
-    pop rbp
     ret
 
 # Hint command
 cmd_hint:
-    push rbp
-    mov rbp, rsp
     push rbx
     push r12
     push r13
@@ -403,17 +387,12 @@ cmd_hint:
     pop r13
     pop r12
     pop rbx
-    pop rbp
     ret
 
 # Help command
 cmd_help:
-    push rbp
-    mov rbp, rsp
     lea rdi, [rip + msg_help]
-    call print_str
-    pop rbp
-    ret
+    jmp print_str
 
 msg_help:
     .ascii "\033[96m\033[1masmlings\033[0m - Learn x86-64 assembly by fixing exercises\n\n"
@@ -435,14 +414,10 @@ msg_help:
 # Print progress bar
 # rdi = passed count, rsi = total count
 print_progress_bar:
-    push rbp
-    mov rbp, rsp
     push rbx
     push r12
     push r13
     push r14
-    sub rsp, 8
-
     mov r12, rdi                    # passed
     mov r13, rsi                    # total
 
@@ -463,7 +438,7 @@ print_progress_bar:
     xor rbx, rbx
 .ppb_filled:
     cmp rbx, r14
-    jge .ppb_empty_start
+    jge .ppb_empty
     lea rdi, [rip + progress_filled]
     push rbx
     call print_str
@@ -471,7 +446,6 @@ print_progress_bar:
     inc rbx
     jmp .ppb_filled
 
-.ppb_empty_start:
 .ppb_empty:
     cmp rbx, PROGRESS_WIDTH
     jge .ppb_counts
@@ -511,10 +485,8 @@ print_progress_bar:
     lea rdi, [rip + msg_pct_close]
     call print_str
 
-    add rsp, 8
     pop r14
     pop r13
     pop r12
     pop rbx
-    pop rbp
     ret

@@ -80,7 +80,6 @@ str_ends_with:
 # str_find: Find substring rsi in string rdi
 # Returns pointer to match or 0
 str_find:
-    push rbx
     push r12
     push r13
     mov r12, rdi
@@ -107,13 +106,13 @@ str_find:
     jmp .str_find_outer
 .str_find_success:
     mov rax, r12
-    jmp .str_find_done
-.str_find_fail:
-    xor eax, eax
-.str_find_done:
     pop r13
     pop r12
-    pop rbx
+    ret
+.str_find_fail:
+    xor eax, eax
+    pop r13
+    pop r12
     ret
 
 # str_compare: Compare strings lexicographically
@@ -133,17 +132,10 @@ str_compare:
     ret
 
 # memcpy: Copy rcx bytes from rsi to rdi
+# Returns destination in rax (C ABI compatible)
 memcpy:
-    test rcx, rcx
-    jz .memcpy_done
-.memcpy_loop:
-    mov al, [rsi]
-    mov [rdi], al
-    inc rsi
-    inc rdi
-    dec rcx
-    jnz .memcpy_loop
-.memcpy_done:
+    mov rax, rdi
+    rep movsb
     ret
 
 # get_filename_ptr: Get pointer to filename part of path (after last /)
