@@ -1,18 +1,48 @@
-Exercise 06: Subtraction
+════════════════════════════════════════
+LESSON 06: The SUB Instruction
+════════════════════════════════════════
 
-sub performs subtraction: subq SOURCE, DESTINATION
-It computes DESTINATION = DESTINATION - SOURCE
+SUBTRACTION IN ASSEMBLY
 
-CAREFUL WITH THE ORDER:
-  subq $10, %rax   means   rax = rax - 10
-  NOT                      rax = 10 - rax
+  subq SOURCE, DEST
 
-The source is what gets SUBTRACTED FROM the destination.
+This computes:  DEST = DEST - SOURCE
 
-THE PROBLEM:
-We have 100 in %rdi and need 77.
-100 - 23 = 77, so we need to subtract 23.
+CAREFUL! The order can be confusing:
+  subq $10, %rax  means  rax = rax - 10
+  NOT                    rax = 10 - rax
 
-TO COMPLETE:
-Add this instruction:
+The SOURCE is what gets subtracted FROM the destination.
+
+
+EXAMPLES
+
+  subq $5, %rax      # rax = rax - 5
+  subq %rbx, %rax    # rax = rax - rbx
+  subq $1, %rdi      # rdi = rdi - 1 (decrement)
+
+
+MENTAL MODEL
+
+Think of it as: "subtract SOURCE from DEST"
+
   subq $23, %rdi
+
+Reads as: "subtract 23 from rdi"
+Result: rdi = rdi - 23
+
+
+THE PROBLEM
+
+You have 100 in %rdi.
+You need 77 in %rdi.
+
+What value subtracted from 100 gives 77?
+  100 - ??? = 77
+
+
+YOUR TASK
+
+Write a subq instruction that subtracts the right value from %rdi.
+
+  subq $???, %rdi

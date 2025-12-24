@@ -1,23 +1,52 @@
-Exercise 03: Moving Data
+════════════════════════════════════════
+LESSON 03: Moving Data Between Registers
+════════════════════════════════════════
 
-mov copies data from one place to another.
-In AT&T syntax: movq SOURCE, DESTINATION
+THE MOV INSTRUCTION
 
-SIZE SUFFIXES:
-  movb - byte (8 bits)
-  movw - word (16 bits)
-  movl - long (32 bits)
-  movq - quad (64 bits)
+mov copies data from one place to another. In AT&T syntax:
 
-We use movq because we're working with 64-bit registers.
+  movq SOURCE, DESTINATION
 
-THE PROBLEM:
-We put 25 in %rax, but the exit syscall reads from %rdi.
-We need to copy the value from %rax to %rdi.
+The source comes FIRST (opposite of Intel syntax!).
 
-TO COMPLETE:
-Add this instruction between the two existing lines:
-  movq %rax, %rdi
 
-This copies the value in %rax into %rdi.
-Note: no $ here because we're copying from a register, not an immediate.
+TYPES OF OPERANDS
+
+1. Immediate (literal value):    $42
+2. Register:                     %rax
+3. Memory:                       label(%rip)
+
+Examples:
+  movq $42, %rax       # Immediate → Register
+  movq %rax, %rbx      # Register → Register
+  movq var(%rip), %rax # Memory → Register
+
+
+REGISTER-TO-REGISTER COPY
+
+When copying between registers, no $ prefix:
+
+  movq %rax, %rdi      # Copy RAX into RDI
+
+This copies the VALUE in RAX to RDI. RAX is unchanged.
+
+
+THE PROBLEM
+
+The code puts 25 into %rax:
+  movq $25, %rax
+
+But the exit syscall reads from %rdi, not %rax.
+The value is in the wrong place!
+
+
+YOUR TASK
+
+Add one instruction to copy the value from %rax to %rdi.
+
+The pattern is:
+  movq %SOURCE_REG, %DEST_REG
+
+Think about which register has the value (source) and which needs it
+(destination).

@@ -1,25 +1,43 @@
-Exercise 17: Loops
+════════════════════════════════════════
+LESSON 17: Storing Data to Memory
+════════════════════════════════════════
 
-A loop is just a conditional jump back to an earlier label.
+STORING TO MEMORY
 
-COMMON PATTERN:
-  movq $5, %rcx        # counter
-loop_start:
-  # ... do something ...
-  decq %rcx            # counter-- (sets ZF if zero)
-  jnz loop_start       # jump if not zero
+To store a register value to a memory location:
 
-decq decrements a register and sets the Zero Flag if it becomes 0.
-jnz = "jump if not zero" (ZF=0).
+  movq %rax, label(%rip)
 
-THE PROBLEM:
-We need to loop 5 times, adding 1 each time.
-The loop body already has addq $1, %rdi.
-We need to decrement the counter and loop.
+This writes the value in %rax to the memory at 'label'.
 
-TO COMPLETE:
-Add these two instructions after addq $1, %rdi:
-  decq %rcx
-  jnz loop_start
 
-Then the syscall code is reached after the loop ends.
+LOAD vs STORE
+
+  movq label(%rip), %rax    # LOAD:  memory → register
+  movq %rax, label(%rip)    # STORE: register → memory
+
+The direction is determined by which operand is memory.
+
+
+THE .DATA SECTION
+
+Variables in .data are read-write. You can modify them.
+
+  .section .data
+  result: .quad 0           # Starts at 0, can be changed
+
+
+STORE THEN LOAD
+
+A common pattern is to compute something, store it, then load it back later.
+This exercise demonstrates that pattern (even though it's redundant here).
+
+
+YOUR TASK
+
+1. Store %rax (which contains 77) to 'result'
+2. Load 'result' back into %rdi
+
+Two instructions:
+  movq %SOURCE, label(%rip)     # Store
+  movq label(%rip), %DEST       # Load

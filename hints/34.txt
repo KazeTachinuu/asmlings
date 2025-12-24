@@ -1,0 +1,67 @@
+════════════════════════════════════════
+LESSON 34: sys_write - Print to Screen
+════════════════════════════════════════
+
+WHAT IS A SYSCALL?
+
+A request to the operating system to perform an action.
+In Linux, you use the "syscall" instruction.
+
+
+THE WRITE SYSCALL
+
+Syscall number: 1 (goes in %rax)
+
+Arguments:
+  %rdi = file descriptor
+  %rsi = pointer to buffer (data to write)
+  %rdx = number of bytes to write
+
+Returns: number of bytes written (in %rax)
+
+
+FILE DESCRIPTORS
+
+Standard streams have fixed numbers:
+  0 = stdin  (input)
+  1 = stdout (output)
+  2 = stderr (error output)
+
+To print to the screen, use stdout (fd = 1).
+
+
+THE PATTERN
+
+  movq $1, %rax           # syscall number for write
+  movq $1, %rdi           # file descriptor (1 = stdout)
+  leaq buffer(%rip), %rsi # pointer to data
+  movq $5, %rdx           # number of bytes
+  syscall
+
+
+COUNTING BYTES
+
+  .ascii "Hi"     # 2 bytes: 'H', 'i'
+  .ascii "Hello"  # 5 bytes: 'H', 'e', 'l', 'l', 'o'
+
+Note: .ascii does NOT include a null terminator.
+For strings, you manually count the characters.
+
+
+COMMON MISTAKES
+
+1. Wrong file descriptor:
+   Using 0 (stdin) instead of 1 (stdout) for output
+
+2. Wrong length:
+   Setting length to 0 writes nothing
+
+3. Wrong buffer pointer:
+   Buffer address goes in %rsi, length in %rdx
+
+
+YOUR TASK
+
+Find and fix two bugs:
+  1. What should the file descriptor be for stdout?
+  2. How many bytes is the string "Hi"?

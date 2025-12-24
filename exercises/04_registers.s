@@ -1,12 +1,21 @@
-# Exercise 04: Registers
+# ============================================================================
+# Exercise 04: Know Your Registers
+# ============================================================================
 #
-# Registers are tiny storage slots in the CPU.
-# For syscalls: number in %rax, args in %rdi, %rsi, %rdx...
+# x86-64 has 16 general-purpose registers. For syscalls:
+#   %rax = syscall NUMBER
+#   %rdi = 1st argument
+#   %rsi = 2nd argument
+#   %rdx = 3rd argument
 #
-# Exit code goes in %rdi (1st arg), not %rsi (2nd arg).
-# Fix the register name.
+# This code puts the exit code in the WRONG register.
+#
+# YOUR TASK: Fix the register name so the exit code is 99.
+#
+# THINK: Which register does the exit syscall read for the exit code?
 #
 # Expected exit code: 99
+# ============================================================================
 
 # I AM NOT DONE
 
@@ -15,5 +24,5 @@
 
 _start:
     movq $60, %rax
-    movq $99, %rsi      # Wrong register!
+    movq $99, %rsi          # BUG: wrong register!
     syscall

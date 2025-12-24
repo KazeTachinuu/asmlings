@@ -1,0 +1,63 @@
+════════════════════════════════════════
+LESSON 30: Stack Frames - Prologue and Epilogue
+════════════════════════════════════════
+
+WHY STACK FRAMES?
+
+In complex functions, %rsp changes as we push/pop values.
+A "stack frame" gives us a stable reference point.
+
+%rbp (Base Pointer) marks the "bottom" of our function's stack area.
+
+
+THE STANDARD PROLOGUE
+
+At the START of every proper function:
+
+  pushq %rbp            # Save caller's base pointer
+  movq %rsp, %rbp       # Set our base pointer to current stack top
+
+After this:
+  - Old %rbp is saved on the stack
+  - Our %rbp points to where %rsp was when we started
+  - We can use %rbp as a stable reference
+
+
+THE STANDARD EPILOGUE
+
+At the END, before ret:
+
+  popq %rbp             # Restore caller's base pointer
+  ret                   # Return to caller
+
+Or use the special instruction:
+
+  leave                 # Same as: movq %rbp, %rsp; popq %rbp
+  ret
+
+
+STACK FRAME LAYOUT
+
+  High addresses
+       │
+       │ [caller's data]
+       │ [return address]      <- pushed by call
+       │ [saved rbp]           <- pushed by prologue, rbp points here
+       │ [local variables]     <- our function's space
+       ↓
+  Low addresses (rsp points here)
+
+
+WHY BOTHER?
+
+1. Debuggers use %rbp to walk the call stack
+2. Local variables are accessed relative to %rbp
+3. Even as %rsp changes, %rbp stays fixed within the function
+
+
+YOUR TASK
+
+Add the prologue (two instructions at the start) and
+the epilogue (one instruction before ret).
+
+The pattern is always the same.

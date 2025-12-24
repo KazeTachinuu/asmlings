@@ -1,0 +1,74 @@
+════════════════════════════════════════
+LESSON 31: Local Variables on the Stack
+════════════════════════════════════════
+
+ALLOCATING SPACE
+
+After the prologue, reserve space for local variables:
+
+  subq $16, %rsp        # Allocate 16 bytes
+
+Always allocate in multiples of 16 for proper alignment!
+
+
+ACCESSING LOCAL VARIABLES
+
+Use negative offsets from %rbp:
+
+  -8(%rbp)    = first 8-byte local
+  -16(%rbp)   = second 8-byte local
+
+Why negative? Because the stack grows down:
+
+  [saved rbp]     <- %rbp points here (offset 0)
+  [local 1]       <- -8(%rbp)
+  [local 2]       <- -16(%rbp)
+
+
+STORING A VALUE
+
+  movq $10, -8(%rbp)    # Store 10 in first local
+
+This is like:
+  int a = 10;
+
+
+LOADING A VALUE
+
+  movq -8(%rbp), %rax   # Load first local into %rax
+
+
+DEALLOCATING
+
+Before the epilogue, clean up:
+
+  movq %rbp, %rsp       # Reset stack pointer to saved position
+
+Or just: addq $16, %rsp  (if you know the exact size)
+
+
+COMPLETE PATTERN
+
+  my_func:
+      pushq %rbp
+      movq %rsp, %rbp
+      subq $16, %rsp          # Allocate 2 locals
+
+      movq $10, -8(%rbp)      # local1 = 10
+      movq $20, -16(%rbp)     # local2 = 20
+
+      movq -8(%rbp), %rax     # Load local1
+      addq -16(%rbp), %rax    # Add local2
+
+      movq %rbp, %rsp         # Deallocate
+      popq %rbp
+      ret
+
+
+YOUR TASK
+
+Fill in four instructions:
+  1. Store 10 at -8(%rbp)
+  2. Store 20 at -16(%rbp)
+  3. Load -8(%rbp) into %rdi
+  4. Add -16(%rbp) to %rdi

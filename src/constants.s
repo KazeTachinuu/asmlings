@@ -28,13 +28,16 @@
 
 # Buffer sizes
 .equ SOURCE_BUFFER_SIZE,    65536
-.equ HINT_BUFFER_SIZE,      1024
-
-# Current exercise count (update when adding exercises)
-.equ EXERCISE_COUNT,        28
+.equ HINT_BUFFER_SIZE,      4096
+.equ OUTPUT_MAX_LEN,        255     # max output to capture (buffer is 256)
 
 # Exercise states
 .equ STATE_NOT_DONE,        0
 .equ STATE_PASSED,          1
 .equ STATE_FAILED,          2
 .equ STATE_WRONG_EXIT,      3
+.equ STATE_WRONG_OUTPUT,    4
+
+# Syscalls for pipes
+.equ SYS_PIPE,              22
+.equ SYS_DUP2,              33

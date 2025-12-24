@@ -1,19 +1,67 @@
-Exercise 26: sys_write
+════════════════════════════════════════
+LESSON 26: Tracing Control Flow
+════════════════════════════════════════
 
-The write syscall (number 1) outputs data:
-  %rax = 1 (syscall number)
-  %rdi = file descriptor (0=stdin, 1=stdout, 2=stderr)
-  %rsi = pointer to buffer
-  %rdx = number of bytes to write
+EXECUTION PATH
 
-Returns: number of bytes written (in %rax)
+Programs don't always run top-to-bottom. Jumps change the flow.
 
-THE PROBLEM:
-Two values are wrong:
-1. %rdi is 0 (stdin) - should be 1 (stdout)
-2. %rdx is 0 (length) - should be 2 (length of "Hi")
 
-TO COMPLETE:
-Change these lines:
-  movq $1, %rdi     # stdout
-  movq $2, %rdx     # 2 bytes
+TRACING A CONDITIONAL
+
+  cmpq %rbx, %rax     # Compute rax - rbx, set flags
+  jge somewhere       # Jump if rax >= rbx
+
+To trace:
+  1. What are the values in rax and rbx?
+  2. Compute the comparison (is rax >= rbx?)
+  3. Determine if the jump is taken or not taken
+  4. Follow the corresponding path
+
+
+THE TWO PATHS
+
+  cmpq %rbx, %rax         # Line A
+  jge greater_or_equal    # Line B
+
+  addq %rbx, %rax         # Line C (not-taken path)
+  jmp done                # Line D
+
+greater_or_equal:
+  subq %rbx, %rax         # Line E (taken path)
+
+done:
+  # Exit here             # Line F
+
+Path if rax >= rbx: A → B → E → F
+Path if rax < rbx:  A → B → C → D → F
+
+
+SIGNED VS UNSIGNED
+
+  jge = jump if greater or equal (SIGNED comparison)
+  jae = jump if above or equal (UNSIGNED comparison)
+
+For positive numbers, they behave the same.
+The difference matters for negative numbers.
+
+
+EXAMPLE TRACE
+
+  rax = 10, rbx = 20
+  cmpq %rbx, %rax     # 10 - 20 = -10 (negative)
+  jge greater_or_equal # 10 >= 20? NO! Jump NOT taken.
+
+Since the jump is not taken, fall through to addq.
+
+
+YOUR TASK
+
+Trace through the code carefully:
+  1. What are rax and rbx at the start?
+  2. Is rax >= rbx?
+  3. Which path is taken?
+  4. What operation is performed?
+  5. What is the final value of rax when we exit?
+
+Write your prediction, then verify.

@@ -1,35 +1,60 @@
-Exercise 01: Your First Program
+════════════════════════════════════════
+LESSON 01: Your First Assembly Program
+════════════════════════════════════════
 
-This exercise is already complete! You just need to understand it and
-delete the "# I AM NOT DONE" line.
+WHAT IS ASSEMBLY?
 
-WHAT'S HAPPENING:
+Assembly is the lowest-level human-readable programming language. Each
+instruction corresponds directly to machine code that the CPU executes.
 
-1. .global _start
-   This tells the linker where the program begins.
-   Every program needs an entry point.
+Unlike high-level languages, there are no functions, objects, or automatic
+memory management. You control everything.
 
-2. .text
-   This declares the code section. Executable instructions go here.
 
-3. _start:
-   This label marks where execution begins.
+ANATOMY OF THIS PROGRAM
 
-4. movq $60, %rax
-   Put the number 60 into register %rax.
-   60 is the "exit" syscall number on Linux.
-   The $ means "literal value" (immediate).
-   The % means "register name".
+  .global _start      ← Export symbol so linker can find entry point
+  .text               ← Code section begins here
 
-5. movq $0, %rdi
-   Put 0 into register %rdi.
-   This is the exit code (0 = success).
-   %rdi holds the first argument for syscalls.
+  _start:             ← Label marking where execution begins
+      movq $60, %rax  ← Put number 60 into register RAX
+      movq $0, %rdi   ← Put number 0 into register RDI
+      syscall         ← Ask kernel to do something
 
-6. syscall
-   Ask the kernel to execute syscall #60 (exit).
-   The kernel reads %rax for the syscall number
-   and %rdi for the first argument.
 
-TO COMPLETE:
-Just delete the line "# I AM NOT DONE" and save the file.
+THE SYSCALL MECHANISM
+
+Your program runs in "user space" - it can't directly access hardware.
+To do anything useful (exit, print, read files), you must ask the kernel.
+
+The 'syscall' instruction transfers control to the Linux kernel.
+The kernel reads %rax to know WHICH service you want.
+
+Syscall 60 = exit (terminate the program)
+
+
+REGISTER ROLES FOR SYSCALLS
+
+  %rax = syscall NUMBER (which service?)
+  %rdi = 1st argument
+  %rsi = 2nd argument
+  %rdx = 3rd argument
+
+For exit:
+  %rax = 60 (the exit syscall)
+  %rdi = exit code (0 = success, non-zero = error)
+
+
+AT&T SYNTAX
+
+Notice the $ and % symbols:
+  $60  = literal value 60 (immediate)
+  %rax = the register named RAX
+
+This is AT&T syntax. Intel syntax looks different but does the same thing.
+
+
+YOUR TASK
+
+This program already works! You just need to understand each line.
+Once you do, remove the "# I AM NOT DONE" line.

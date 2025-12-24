@@ -1,23 +1,48 @@
-Exercise 20: Call and Return
+════════════════════════════════════════
+LESSON 20: Comparison and CPU Flags
+════════════════════════════════════════
 
-call and ret implement function calls:
+THE CMP INSTRUCTION
 
-  call label    # push return address, jump to label
-  ret           # pop return address, jump to it
+  cmpq B, A
 
-When you 'call', the address of the NEXT instruction is pushed.
-When the function does 'ret', it pops that address and jumps back.
+Computes A - B and sets CPU flags. The result is DISCARDED.
 
-THE PROBLEM:
-We need to write a function called set_value that:
-1. Puts 66 into %rdi
-2. Returns
+Think of it as: "compare A with B" or "how does A relate to B?"
 
-TO COMPLETE:
-Add the function at the end of the file:
 
-set_value:
-    movq $66, %rdi
-    ret
+CPU FLAGS
 
-That's it! The function sets %rdi to 66 and returns.
+Flags are single-bit values that record information about the last operation.
+
+  ZF (Zero Flag)     Set if result = 0 (A == B)
+  SF (Sign Flag)     Set if result < 0 (A < B for signed)
+  CF (Carry Flag)    Set if unsigned borrow (A < B for unsigned)
+  OF (Overflow Flag) Set if signed overflow
+
+
+AFTER CMP
+
+  cmpq $50, %rdi     # Computes rdi - 50
+
+  If rdi = 50:  50 - 50 = 0   → ZF = 1
+  If rdi = 25:  25 - 50 = -25 → ZF = 0, SF = 1
+  If rdi = 75:  75 - 50 = 25  → ZF = 0, SF = 0
+
+
+CONDITIONAL JUMPS
+
+After cmp, use conditional jumps to branch:
+
+  je   label    # Jump if Equal (ZF = 1)
+  jne  label    # Jump if Not Equal (ZF = 0)
+  jl   label    # Jump if Less (signed)
+  jg   label    # Jump if Greater (signed)
+
+
+YOUR TASK
+
+The comparison checks if %rdi equals 50.
+Currently %rdi is 25, so the jump doesn't happen.
+
+Fix %rdi so the comparison succeeds (makes ZF = 1).

@@ -1,24 +1,49 @@
-Exercise 15: Comparison
+════════════════════════════════════════
+LESSON 15: Debug Challenge - Think Like a Debugger
+════════════════════════════════════════
 
-cmpq compares two values by subtracting them and setting CPU flags.
-The result is thrown away - only the flags matter.
+THE CODE CLAIMS TO COMPUTE
 
-  cmpq $50, %rdi    # computes rdi - 50, sets flags
+  (10 + 5) * 4 = 60
 
-FLAGS:
-  ZF (Zero Flag): set if result = 0 (values are equal)
-  SF (Sign Flag): set if result < 0 (first < second)
+Let's trace it:
 
-After cmp, use conditional jumps:
-  je  label   # jump if equal (ZF=1)
-  jne label   # jump if not equal (ZF=0)
+  movq $10, %rdi       # rdi = 10
+  movq $5, %rsi        # rsi = 5
+  movq $4, %rdx        # rdx = 4
+  addq %rsi, %rdi      # rdi = 10 + 5 = 15  ✓
+  imulq %rdi, %rdx     # rdx = rdx * rdi = 4 * 15 = 60  ✓
 
-THE PROBLEM:
-The comparison checks if %rdi equals 50.
-Currently %rdi is 25, so je doesn't jump.
 
-TO COMPLETE:
-Change $25 to $50:
-  movq $50, %rdi
+SO WHAT'S WRONG?
 
-Now cmpq $50, %rdi computes 50 - 50 = 0, setting ZF, and je jumps.
+After imulq, where is the result?
+
+  imulq %rdi, %rdx
+
+The result (60) is in %rdx.
+
+
+BUT WHERE DOES EXIT READ?
+
+The exit syscall reads the exit code from %rdi, not %rdx!
+
+After the multiply:
+  %rdi = 15 (unchanged by imulq)
+  %rdx = 60 (the result)
+
+The program exits with 15, not 60!
+
+
+THE FIX
+
+You need to either:
+1. Use a different destination for imulq so result ends up in %rdi
+2. Move the result to %rdi after multiplication
+
+Think about what the destination of imulq should be.
+
+
+YOUR TASK
+
+Fix the bug so the calculation result ends up in %rdi.

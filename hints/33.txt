@@ -1,0 +1,71 @@
+════════════════════════════════════════
+LESSON 33: Callee-Save Registers - The Contract
+════════════════════════════════════════
+
+THE TWO CATEGORIES
+
+CALLEE-SAVE (you must preserve):
+  %rbx, %rbp, %r12, %r13, %r14, %r15
+
+If your function uses any of these, YOU must save them at the start
+and restore them before returning.
+
+CALLER-SAVE (may be destroyed):
+  %rax, %rcx, %rdx, %rsi, %rdi, %r8, %r9, %r10, %r11
+
+The caller assumes these might change after any function call.
+If the caller needs them, the caller must save them.
+
+
+WHY THIS SPLIT?
+
+It's about efficiency:
+  - 6 callee-save registers are "safe havens" across calls
+  - 11 caller-save registers are "scratch space"
+
+Functions that don't use callee-save registers need no extra saves.
+Callers that don't need values preserved across calls need no extra saves.
+
+
+THE CALLEE'S RESPONSIBILITY
+
+If you use a callee-save register, you MUST:
+
+  my_func:
+      pushq %rbx          # Save (we're going to use rbx)
+
+      movq $999, %rbx     # Use it for our work
+      # ... more work ...
+
+      popq %rbx           # Restore before returning
+      ret
+
+
+IF YOU DON'T SAVE...
+
+  _start:
+      movq $73, %rbx      # Caller puts important value in rbx
+      call clobber_func   # Call function that uses rbx
+      movq %rbx, %rdi     # Caller expects rbx = 73...
+                          # But it's 999! The contract was broken!
+
+
+THE PATTERN
+
+  func:
+      pushq %rbx          # Save callee-save registers you'll use
+      pushq %r12          # (in any order)
+
+      # ... your code that uses rbx and r12 ...
+
+      popq %r12           # Restore in REVERSE order!
+      popq %rbx
+      ret
+
+
+YOUR TASK
+
+The caller has 73 in %rbx. Your function clobbers %rbx.
+Save it at the start, restore it before returning.
+
+What two instructions do you need to add?

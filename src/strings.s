@@ -132,10 +132,29 @@ str_compare:
     ret
 
 # memcpy: Copy rcx bytes from rsi to rdi
-# Returns destination in rax (C ABI compatible)
 memcpy:
     mov rax, rdi
     rep movsb
+    ret
+
+# memcmp: Compare rcx bytes at rdi with rsi
+# Returns: 0 if equal, non-zero if different
+memcmp:
+    test rcx, rcx
+    jz .memcmp_eq
+.memcmp_loop:
+    mov al, [rdi]
+    cmp al, [rsi]
+    jne .memcmp_diff
+    inc rdi
+    inc rsi
+    dec rcx
+    jnz .memcmp_loop
+.memcmp_eq:
+    xor eax, eax
+    ret
+.memcmp_diff:
+    mov eax, 1
     ret
 
 # get_filename_ptr: Get pointer to filename part of path (after last /)

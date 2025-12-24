@@ -1,23 +1,58 @@
-Exercise 02: Exit Codes
+════════════════════════════════════════
+LESSON 02: Exit Codes
+════════════════════════════════════════
 
-Exit codes tell the system whether a program succeeded or failed.
-By convention: 0 = success, anything else = some kind of error.
+WHAT ARE EXIT CODES?
 
-THE SYNTAX:
+When a program terminates, it returns a number to the operating system.
+This is the "exit code" or "return code."
+
+Convention:
+  0       = Success
+  1-255   = Various error conditions
+
+In shell scripts, you can check: if command succeeds, do X, else do Y.
+
+
+CHECKING EXIT CODES
+
+In bash, run your program then check with:
+
+  ./your_program
+  echo $?          ← Prints the exit code
+
+Try it! Run any command and check its exit code.
+
+
+THE INSTRUCTION
+
   movq $0, %rdi
 
-  - movq: move quad (64 bits)
-  - $0: the literal value 0 ($ = immediate)
-  - %rdi: the destination register (% = register)
+Breaking this down:
+  - mov   = "move" (copy data)
+  - q     = "quad" (64-bit operation)
+  - $0    = literal value 0
+  - %rdi  = destination register
 
-TO COMPLETE:
-Change $0 to $42 in the line:
-  movq $0, %rdi
+This puts the value 0 into register RDI.
 
-The result should be:
-  movq $42, %rdi
 
-WHY IT WORKS:
-The exit syscall reads the exit code from %rdi.
-Whatever value is in %rdi when you call syscall
-becomes the program's exit code.
+SIZE SUFFIXES
+
+In AT&T syntax, the instruction suffix indicates operand size:
+  - movb = byte (8 bits)
+  - movw = word (16 bits)
+  - movl = long (32 bits)
+  - movq = quad (64 bits)
+
+For 64-bit registers (rax, rdi, etc.), use 'q'.
+
+
+YOUR TASK
+
+Change the exit code from 0 to 42.
+
+Think about:
+- Which line controls the exit code?
+- What value is currently there?
+- What should you change it to?

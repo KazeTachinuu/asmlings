@@ -1,9 +1,5 @@
 .section .text
 
-cmd_list_str:       .asciz "list"
-cmd_watch_str:      .asciz "watch"
-cmd_hint_str:       .asciz "hint"
-
 # List all exercises with their status
 cmd_list:
     push rbx
@@ -67,8 +63,9 @@ cmd_list:
     jmp .list_loop
 
 .list_no_exercises:
-    lea rdi, [rip + msg_no_exercises]
-    call print_str
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_no_exercises]
+    call print_colored
     jmp .list_exit
 
 .list_done:
@@ -122,7 +119,6 @@ cmd_watch:
     jz .watch_all_done
 
     mov r14, rax
-    mov [rip + current_exercise], rax
 
     # Check and display current exercise (same as event handler)
     jmp .watch_check_exercise
@@ -131,7 +127,13 @@ cmd_watch:
     lea rdi, [rip + clear_screen]
     call print_str
     call print_banner
+    lea rdi, [rip + color_green]
+    call print_str
+    lea rdi, [rip + style_bold]
+    call print_str
     lea rdi, [rip + msg_complete]
+    call print_str
+    lea rdi, [rip + color_reset]
     call print_str
     jmp .watch_exit
 
@@ -176,7 +178,6 @@ cmd_watch:
     test rax, rax
     jz .watch_next_event            # exercise not found
     mov r14, rax
-    mov [rip + current_exercise], rax
 
 .watch_check_exercise:
     # Clear screen and show banner
@@ -186,6 +187,8 @@ cmd_watch:
 
     # Check the exercise
     lea rdi, [rip + msg_checking]
+    call print_str
+    lea rdi, [rip + style_bold]
     call print_str
     mov rdi, r14
     call get_filename_ptr
@@ -209,14 +212,58 @@ cmd_watch:
     cmp r13, STATE_WRONG_EXIT
     je .watch_ex_wrong_exit
 
+    cmp r13, STATE_WRONG_OUTPUT
+    je .watch_ex_wrong_output
+
     # Compilation failed
-    lea rdi, [rip + msg_failed]
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_failed]
+    call print_colored
+    lea rdi, [rip + style_dim]
+    lea rsi, [rip + msg_hint_tip]
+    call print_colored
+    jmp .watch_show_progress
+
+.watch_ex_wrong_output:
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_wrong_output]
+    call print_colored
+    # Show expected
+    lea rdi, [rip + style_dim]
     call print_str
-    lea rdi, [rip + msg_hint_tip]
+    lea rdi, [rip + msg_expected_out]
     call print_str
+    lea rdi, [rip + expected_output]
+    call print_str
+    lea rdi, [rip + msg_quote_end]
+    call print_str
+    # Show actual
+    lea rdi, [rip + msg_actual_out]
+    call print_str
+    lea rdi, [rip + actual_output]
+    call print_str
+    lea rdi, [rip + msg_quote_end]
+    call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
+    lea rdi, [rip + style_dim]
+    lea rsi, [rip + msg_hint_tip]
+    call print_colored
     jmp .watch_show_progress
 
 .watch_ex_wrong_exit:
+    # Check if this is a predict exercise (don't reveal answer)
+    mov rdi, r14
+    call get_filename_ptr
+    mov rdi, rax
+    lea rsi, [rip + pattern_predict]
+    call str_find
+    test rax, rax
+    jnz .watch_ex_wrong_predict
+
+    # Normal exercise - show actual vs expected
+    lea rdi, [rip + color_red]
+    call print_str
     lea rdi, [rip + msg_wrong_exit]
     call print_str
     mov rdi, [rip + last_exit_actual]
@@ -225,23 +272,42 @@ cmd_watch:
     call print_str
     mov rdi, [rip + last_exit_expected]
     call print_number
-    call print_newline
-    lea rdi, [rip + msg_hint_tip]
+    lea rdi, [rip + color_reset]
     call print_str
+    call print_newline
+    lea rdi, [rip + style_dim]
+    lea rsi, [rip + msg_hint_tip]
+    call print_colored
+    jmp .watch_show_progress
+
+.watch_ex_wrong_predict:
+    # Predict exercise - don't reveal the answer
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_wrong_predict]
+    call print_colored
+    lea rdi, [rip + style_dim]
+    lea rsi, [rip + msg_hint_tip]
+    call print_colored
     jmp .watch_show_progress
 
 .watch_ex_not_done:
-    lea rdi, [rip + msg_not_done]
+    lea rdi, [rip + color_yellow]
+    lea rsi, [rip + msg_not_done]
+    call print_colored
+    lea rdi, [rip + style_dim]
     call print_str
     lea rdi, [rip + msg_remove_marker]
     call print_str
     lea rdi, [rip + msg_hint_tip]
     call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
     jmp .watch_show_progress
 
 .watch_ex_passed:
-    lea rdi, [rip + msg_passed]
-    call print_str
+    lea rdi, [rip + color_green]
+    lea rsi, [rip + msg_passed]
+    call print_colored
 
     # Find next incomplete
     call find_incomplete
@@ -249,9 +315,12 @@ cmd_watch:
     jz .watch_all_complete
 
     mov r14, rax
-    mov [rip + current_exercise], rax
 
+    lea rdi, [rip + color_cyan]
+    call print_str
     lea rdi, [rip + msg_next]
+    call print_str
+    lea rdi, [rip + style_bold]
     call print_str
     mov rdi, r14
     call get_filename_ptr
@@ -263,7 +332,13 @@ cmd_watch:
     jmp .watch_show_progress
 
 .watch_all_complete:
+    lea rdi, [rip + color_green]
+    call print_str
+    lea rdi, [rip + style_bold]
+    call print_str
     lea rdi, [rip + msg_complete]
+    call print_str
+    lea rdi, [rip + color_reset]
     call print_str
 
 .watch_show_progress:
@@ -294,8 +369,9 @@ cmd_watch:
     call print_progress_bar
 
     call print_newline
-    lea rdi, [rip + msg_watching]
-    call print_str
+    lea rdi, [rip + style_dim]
+    lea rsi, [rip + msg_watching]
+    call print_colored
     jmp .watch_loop
 
 .watch_next_event:
@@ -315,13 +391,15 @@ cmd_watch:
     jmp .watch_loop
 
 .watch_no_exercises:
-    lea rdi, [rip + msg_no_exercises]
-    call print_str
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_no_exercises]
+    call print_colored
     jmp .watch_exit
 
 .watch_error:
-    lea rdi, [rip + msg_error]
-    call print_str
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_error]
+    call print_colored
 
 .watch_exit:
     pop r15
@@ -350,8 +428,9 @@ cmd_hint:
     test rax, rax
     jnz .hint_show
 
-    lea rdi, [rip + msg_not_found]
-    call print_str
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_not_found]
+    call print_colored
     jmp .hint_exit
 
 .hint_current:
@@ -362,11 +441,17 @@ cmd_hint:
 .hint_show:
     mov r12, rax
 
+    lea rdi, [rip + color_yellow]
+    call print_str
     lea rdi, [rip + msg_hint_for]
+    call print_str
+    lea rdi, [rip + style_bold]
     call print_str
     mov rdi, r12
     call get_filename_ptr
     mov rdi, rax
+    call print_str
+    lea rdi, [rip + color_reset]
     call print_str
     lea rdi, [rip + msg_hint_end]
     call print_str
@@ -379,8 +464,9 @@ cmd_hint:
     jmp .hint_exit
 
 .hint_all_done:
-    lea rdi, [rip + msg_no_hint]
-    call print_str
+    lea rdi, [rip + color_green]
+    lea rsi, [rip + msg_no_hint]
+    call print_colored
 
 .hint_exit:
     call print_newline
@@ -391,19 +477,66 @@ cmd_hint:
 
 # Help command
 cmd_help:
-    lea rdi, [rip + msg_help]
-    jmp print_str
+    push rbx
 
-msg_help:
-    .ascii "\033[96m\033[1masmlings\033[0m - Learn x86-64 assembly by fixing exercises\n\n"
-    .ascii "\033[1mUSAGE:\033[0m\n"
-    .ascii "    ./asmlings [COMMAND]\n\n"
-    .ascii "\033[1mCOMMANDS:\033[0m\n"
-    .ascii "    watch    Watch for changes and check exercises (default)\n"
-    .ascii "    list     Show all exercises with status\n"
-    .ascii "    hint     Show hint for current (or specified) exercise\n"
-    .ascii "    help     Show this help message\n\n"
-    .ascii "\033[1mGETTING STARTED:\033[0m\n"
+    # Title
+    lea rdi, [rip + color_cyan]
+    call print_str
+    lea rdi, [rip + style_bold]
+    call print_str
+    lea rdi, [rip + help_title]
+    call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
+    lea rdi, [rip + help_subtitle]
+    call print_str
+
+    # Usage section
+    lea rdi, [rip + style_bold]
+    call print_str
+    lea rdi, [rip + help_usage_hdr]
+    call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
+    lea rdi, [rip + help_usage]
+    call print_str
+
+    # Commands section
+    lea rdi, [rip + style_bold]
+    call print_str
+    lea rdi, [rip + help_cmds_hdr]
+    call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
+    lea rdi, [rip + help_cmds]
+    call print_str
+
+    # Getting started section
+    lea rdi, [rip + style_bold]
+    call print_str
+    lea rdi, [rip + help_start_hdr]
+    call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
+    lea rdi, [rip + help_start]
+    call print_str
+
+    pop rbx
+    ret
+
+help_title:     .asciz "asmlings"
+help_subtitle:  .asciz " - Learn x86-64 assembly by fixing exercises\n\n"
+help_usage_hdr: .asciz "USAGE:\n"
+help_usage:     .asciz "    ./asmlings [COMMAND]\n\n"
+help_cmds_hdr:  .asciz "COMMANDS:\n"
+help_cmds:
+    .ascii "    watch      Watch for changes and check exercises (default)\n"
+    .ascii "    list       Show all exercises with status\n"
+    .ascii "    hint [N]   Show hint for current or exercise N (e.g. hint 05)\n"
+    .ascii "    help       Show this help message\n\n"
+    .byte 0
+help_start_hdr: .asciz "GETTING STARTED:\n"
+help_start:
     .ascii "    1. Run ./asmlings watch\n"
     .ascii "    2. Open exercises/01_intro.s in your editor\n"
     .ascii "    3. Read the instructions and fix the code\n"
@@ -411,82 +544,3 @@ msg_help:
     .ascii "    5. Save - asmlings will check your solution!\n\n"
     .byte 0
 
-# Print progress bar
-# rdi = passed count, rsi = total count
-print_progress_bar:
-    push rbx
-    push r12
-    push r13
-    push r14
-    mov r12, rdi                    # passed
-    mov r13, rsi                    # total
-
-    lea rdi, [rip + msg_progress]
-    call print_str
-
-    # Calculate filled blocks
-    mov rax, r12
-    imul rax, PROGRESS_WIDTH
-    test r13, r13
-    jz .ppb_skip_div
-    xor rdx, rdx
-    div r13
-.ppb_skip_div:
-    mov r14, rax                    # filled count
-
-    # Print filled
-    xor rbx, rbx
-.ppb_filled:
-    cmp rbx, r14
-    jge .ppb_empty
-    lea rdi, [rip + progress_filled]
-    push rbx
-    call print_str
-    pop rbx
-    inc rbx
-    jmp .ppb_filled
-
-.ppb_empty:
-    cmp rbx, PROGRESS_WIDTH
-    jge .ppb_counts
-    lea rdi, [rip + progress_empty]
-    push rbx
-    call print_str
-    pop rbx
-    inc rbx
-    jmp .ppb_empty
-
-.ppb_counts:
-    lea rdi, [rip + msg_bracket_close]
-    call print_str
-
-    mov rdi, r12
-    call print_number
-    lea rdi, [rip + msg_slash]
-    call print_str
-    mov rdi, r13
-    call print_number
-
-    # Percentage
-    mov rax, r12
-    imul rax, 100
-    test r13, r13
-    jz .ppb_skip_pct
-    xor rdx, rdx
-    div r13
-.ppb_skip_pct:
-    push rax
-    mov rdi, ' '
-    call print_char
-    mov rdi, '('
-    call print_char
-    pop rdi
-    call print_number
-    lea rdi, [rip + msg_pct_close]
-    call print_str
-
-    pop r14
-    pop r13
-    pop r12
-    pop rbx
-    ret

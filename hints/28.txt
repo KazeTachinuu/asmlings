@@ -1,31 +1,61 @@
-Exercise 28: String Length
+════════════════════════════════════════
+LESSON 28: Saving and Restoring Registers
+════════════════════════════════════════
 
-C strings are null-terminated - they end with byte 0.
-To find the length, count characters until you hit 0.
+THE PROBLEM
 
-ALGORITHM:
-  length = 0
-  while *ptr != 0:
-    length++
-    ptr++
+Registers are a limited resource. Sometimes you need a register, but
+it already holds an important value.
 
-INSTRUCTIONS NEEDED:
-  cmpb $0, (%rdi)    # compare byte at address rdi with 0
-  je strlen_done     # if zero, we're done
-  incq %rax          # length++
-  incq %rdi          # ptr++
-  jmp strlen_loop    # repeat
+  movq $55, %rdi          # Important value in %rdi
+  # Now we need %rdi for something else...
+  movq $999, %rdi         # Oops! We lost 55!
 
-Note: cmpb compares BYTES (8-bit), not quads.
-(%rdi) means "the value at address rdi" - memory access.
 
-TO COMPLETE:
-Add these instructions in strlen_loop:
+THE SOLUTION: THE STACK
 
-  cmpb $0, (%rdi)
-  je strlen_done
-  incq %rax
-  incq %rdi
-  jmp strlen_loop
+Push the value before clobbering, pop it after:
 
-"Hello" has 5 characters, so exit code is 5.
+  movq $55, %rdi          # Important value
+
+  pushq %rdi              # SAVE: Store 55 on stack
+  movq $999, %rdi         # Clobber %rdi freely
+  # ... do more work ...
+  popq %rdi               # RESTORE: Get 55 back
+
+After the popq, %rdi is 55 again!
+
+
+THE PATTERN
+
+  pushq %REG        # Save before clobbering
+  # ... code that uses %REG for something else ...
+  popq %REG         # Restore after done
+
+
+IMPORTANT: BALANCE YOUR PUSHES AND POPS
+
+Every push must have a matching pop!
+
+  pushq %rdi
+  pushq %rsi
+  # ... work ...
+  popq %rsi        # LIFO: pop in REVERSE order!
+  popq %rdi
+
+
+STACK STATE
+
+  Before push:    Stack: [...]           rdi = 55
+  After push:     Stack: [...][55]       rdi = 55
+  After clobber:  Stack: [...][55]       rdi = 999
+  After pop:      Stack: [...]           rdi = 55
+
+
+YOUR TASK
+
+You have two spots to fill:
+  1. Before the clobbering line, save the register
+  2. After the clobbering line, restore it
+
+What instructions do you need to add?

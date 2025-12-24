@@ -1,0 +1,61 @@
+════════════════════════════════════════
+LESSON 32: Function Arguments - The Calling Convention
+════════════════════════════════════════
+
+THE SYSTEM V AMD64 ABI
+
+This is the standard calling convention on Linux x86-64.
+
+Arguments are passed in registers (in order):
+
+  1st argument:  %rdi
+  2nd argument:  %rsi
+  3rd argument:  %rdx
+  4th argument:  %rcx
+  5th argument:  %r8
+  6th argument:  %r9
+
+Additional arguments go on the stack (rare in practice).
+
+
+RETURN VALUE
+
+  Return value:  %rax
+
+
+EXAMPLE: add(a, b)
+
+Caller sets up:
+  movq $25, %rdi        # First argument (a = 25)
+  movq $19, %rsi        # Second argument (b = 19)
+  call add
+
+Callee uses them:
+  add:
+      movq %rdi, %rax   # Get first argument
+      addq %rsi, %rax   # Add second argument
+      ret               # Return sum in %rax
+
+
+WHY REGISTERS?
+
+Registers are much faster than memory.
+Most functions have 6 or fewer arguments, so this is efficient.
+
+
+THE CONTRACT
+
+When you call a function:
+  - You put arguments in the right registers
+  - You expect the return value in %rax
+  - Some registers may be clobbered (caller-save)
+  - Some registers will be preserved (callee-save)
+
+
+YOUR TASK
+
+Two parts:
+  1. Before call: Set up arguments for add(25, 19)
+  2. Inside add: Add the arguments and put result in %rax
+
+Remember: %rdi is first argument, %rsi is second.

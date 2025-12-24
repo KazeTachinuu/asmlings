@@ -1,11 +1,17 @@
+# ============================================================================
 # Exercise 06: Subtraction
+# ============================================================================
 #
-# subq subtracts: subq SOURCE, DEST
-# Computes DEST = DEST - SOURCE
+# subq SOURCE, DEST  ->  DEST = DEST - SOURCE
 #
-# We have 100. Subtract to get 77.
+# CAREFUL with the order! It's not intuitive.
+#   subq $10, %rax  means  rax = rax - 10
+#   NOT                    rax = 10 - rax
+#
+# YOUR TASK: We have 100 in %rdi. Make it 77.
 #
 # Expected exit code: 77
+# ============================================================================
 
 # I AM NOT DONE
 
@@ -15,7 +21,8 @@
 _start:
     movq $100, %rdi
 
-    # Subtract from rdi here
+    # YOUR CODE HERE: subtract from %rdi to get 77
+
 
     movq $60, %rax
     syscall

@@ -1,18 +1,73 @@
-Exercise 27: sys_read
+════════════════════════════════════════
+LESSON 27: The Stack - Push and Pop
+════════════════════════════════════════
 
-The read syscall (number 0) reads input:
-  %rax = 0 (syscall number)
-  %rdi = file descriptor (0 = stdin)
-  %rsi = pointer to buffer
-  %rdx = maximum bytes to read
+WHAT IS THE STACK?
 
-Returns: number of bytes actually read (in %rax)
+A region of memory used for temporary storage.
+It grows DOWNWARD (toward lower addresses).
 
-This exercise is already complete!
-The code correctly sets up sys_read and uses the return value
-(bytes read) as the exit code.
+%rsp (Stack Pointer) always points to the TOP of the stack.
 
-TO COMPLETE:
-Just delete the "# I AM NOT DONE" line.
 
-The test will send "hello" (5 bytes), so exit code will be 5.
+PUSH - Put Something On
+
+  pushq %rax
+
+Equivalent to:
+  subq $8, %rsp           # Make room (move stack pointer down)
+  movq %rax, (%rsp)       # Store value at new top
+
+The stack grows DOWN, so we SUBTRACT to push.
+
+
+POP - Take Something Off
+
+  popq %rax
+
+Equivalent to:
+  movq (%rsp), %rax       # Load value from top
+  addq $8, %rsp           # Shrink stack (move pointer up)
+
+
+LIFO - Last In, First Out
+
+The stack is like a stack of plates:
+  - You can only access the TOP
+  - Last thing pushed is first thing popped
+
+  pushq $42       # Stack: [42]       ← top
+  pushq $99       # Stack: [42][99]   ← top
+
+  popq %rax       # rax = 99, Stack: [42]   ← top
+  popq %rbx       # rbx = 42, Stack: empty
+
+
+VISUALIZING THE STACK
+
+  Higher addresses
+       │
+       │ [older data]
+       │ [42]         ← pushed first
+       │ [99]         ← pushed last, RSP points here
+       ↓
+  Lower addresses
+
+
+DISCARDING A VALUE
+
+Sometimes you need to pop but don't care about the value:
+
+  popq %rax       # Pop into rax (value is discarded after)
+
+Or:
+  addq $8, %rsp   # Just adjust the pointer (more efficient)
+
+
+YOUR TASK
+
+You need to pop twice to get 42 into %rdi.
+First pop gets 99 (LIFO - it was pushed last).
+Second pop gets 42.
+
+Think about what register each pop should target.

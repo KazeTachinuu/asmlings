@@ -1,12 +1,19 @@
+# ============================================================================
 # Exercise 02: Exit Codes
+# ============================================================================
 #
-# Exit codes: 0 = success, non-zero = error.
-# The $ prefix means "literal value" (immediate).
-# The % prefix means "register name".
+# Exit codes tell the operating system if your program succeeded or failed.
 #
-# Change the exit code from 0 to 42.
+# Convention:
+#   0     = success
+#   1-255 = various error conditions
+#
+# The shell command "echo $?" shows the last program's exit code.
+#
+# YOUR TASK: Make this program exit with code 42.
 #
 # Expected exit code: 42
+# ============================================================================
 
 # I AM NOT DONE
 
@@ -14,6 +21,6 @@
 .text
 
 _start:
-    movq $60, %rax      # exit syscall
-    movq $0, %rdi       # <- change this value
+    movq $60, %rax
+    movq $0, %rdi           # What should this value be?
     syscall

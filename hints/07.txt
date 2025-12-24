@@ -1,20 +1,42 @@
-Exercise 07: Multiplication
+════════════════════════════════════════
+LESSON 07: Tracing Code Execution
+════════════════════════════════════════
 
-imul multiplies signed integers.
+WHY TRACE CODE?
 
-TWO-OPERAND FORM:
-  imulq %rbx, %rax    # rax = rax * rbx
+Real programmers spend more time READING code than writing it.
+Being able to mentally execute code is a crucial skill.
 
-THREE-OPERAND FORM:
-  imulq $5, %rbx, %rax    # rax = rbx * 5
+This exercise has no coding. Just thinking!
 
-THE PROBLEM:
-We have 7 in %rdi and 8 in %rsi.
-We need to multiply them: 7 * 8 = 56
-The result must end up in %rdi.
 
-TO COMPLETE:
-Add this instruction:
-  imulq %rsi, %rdi
+HOW TO TRACE
 
-This computes rdi = rdi * rsi = 7 * 8 = 56.
+Go line by line. Track register values:
+
+  movq $50, %rdi     # After: rdi=50
+  movq $30, %rax     # After: rdi=50, rax=30
+  addq %rax, %rdi    # After: rdi=80, rax=30  (50+30)
+  ...and so on
+
+
+THE CODE
+
+  movq $50, %rdi      # rdi = 50
+  movq $30, %rax      # rax = 30
+  addq %rax, %rdi     # rdi = rdi + rax = ???
+  subq $15, %rdi      # rdi = rdi - 15 = ???
+  addq $2, %rdi       # rdi = rdi + 2 = ???
+
+Work through each step. What's the final value of %rdi?
+
+
+YOUR TASK
+
+1. Trace through the code on paper or in your head
+2. Predict the exit code
+3. The comment says "Expected exit code: ???"
+4. Remove the marker - the test will verify your prediction
+
+DON'T run it first! The point is to build your tracing skills.
+Verify AFTER you've made your prediction.

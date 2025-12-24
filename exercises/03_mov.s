@@ -1,12 +1,18 @@
-# Exercise 03: Moving Data
+# ============================================================================
+# Exercise 03: Moving Data Between Registers
+# ============================================================================
 #
-# mov copies data: movq SOURCE, DESTINATION
-# The 'q' means 64-bit (quad word).
+# The mov instruction copies data: mov SOURCE, DESTINATION
+# (AT&T syntax: source comes first!)
 #
-# We have 25 in %rax but need it in %rdi for exit.
-# Add one instruction to copy %rax to %rdi.
+# The 'q' suffix means "quadword" (64 bits).
+# Other sizes: b (byte), w (word/16-bit), l (long/32-bit)
+#
+# YOUR TASK: The value 25 is in %rax, but exit reads from %rdi.
+#            Add ONE instruction to copy %rax to %rdi.
 #
 # Expected exit code: 25
+# ============================================================================
 
 # I AM NOT DONE
 
@@ -16,7 +22,8 @@
 _start:
     movq $25, %rax
 
-    # Copy rax to rdi here
+    # YOUR CODE HERE: copy %rax to %rdi
+
 
     movq $60, %rax
     syscall

@@ -1,22 +1,58 @@
-Exercise 25: Callee-Save Registers
+════════════════════════════════════════
+LESSON 25: Debugging Infinite Loops
+════════════════════════════════════════
 
-Some registers MUST be preserved by called functions:
+WHAT IS AN INFINITE LOOP?
 
-CALLEE-SAVE (you must save/restore if you use them):
-  %rbx, %rbp, %r12, %r13, %r14, %r15
+A loop that never terminates because its exit condition is never met
+(or the exit path is never taken).
 
-CALLER-SAVE (caller must save if it needs them after call):
-  %rax, %rcx, %rdx, %rsi, %rdi, %r8, %r9, %r10, %r11
 
-THE PROBLEM:
-The caller has 73 in %rbx. Our function clobbers %rbx.
-We must save it before clobbering and restore it after.
+COMMON CAUSES
 
-TO COMPLETE:
-Save %rbx at the start:
-  pushq %rbx
+  1. Condition never becomes false:
+       movq $5, %rcx
+     loop:
+       addq $1, %rcx       # Oops! Should be decq
+       jnz loop            # rcx grows forever!
 
-Restore it before ret:
-  popq %rbx
+  2. Wrong comparison:
+       cmpq $0, %rcx
+       jne loop            # But we wanted jge!
 
-This preserves the caller's value as required.
+  3. Unreachable exit:
+       jnz loop
+       jmp loop            # This ALWAYS jumps, ignoring jnz!
+
+
+UNDERSTANDING FALL-THROUGH
+
+When a conditional jump is NOT taken, execution "falls through" to the
+next instruction:
+
+  jnz loop          # If ZF=0, jump to loop
+  # If ZF=1, we fall through to here
+
+If the next instruction is "jmp loop", we go to loop either way!
+
+
+DEBUGGING TECHNIQUE
+
+Trace the loop manually:
+
+  Iteration 1: rcx = 5 → decq → rcx = 4 → jnz taken (4 != 0)
+  Iteration 2: rcx = 4 → decq → rcx = 3 → jnz taken (3 != 0)
+  Iteration 3: rcx = 3 → decq → rcx = 2 → jnz taken (2 != 0)
+  Iteration 4: rcx = 2 → decq → rcx = 1 → jnz taken (1 != 0)
+  Iteration 5: rcx = 1 → decq → rcx = 0 → jnz NOT taken (0 == 0)
+  → Falls through to next instruction...
+
+What happens next? Does execution reach the exit, or loop again?
+
+
+YOUR TASK
+
+The code has a structure flaw. After jnz decides NOT to jump,
+what instruction does execution hit next?
+
+Remove or fix the offending instruction so the loop can exit properly.

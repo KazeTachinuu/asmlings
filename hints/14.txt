@@ -1,15 +1,57 @@
-Exercise 14: Storing to Memory
+════════════════════════════════════════
+LESSON 14: LEA - The Address Calculator
+════════════════════════════════════════
 
-To store a value to memory:
-  movq %rax, label(%rip)
+WHAT IS LEA?
 
-THE PROBLEM:
-1. Store the value 77 (in %rax) into 'result'
-2. Load it back into %rdi
+LEA = "Load Effective Address"
 
-TO COMPLETE:
-Add these two instructions:
-  movq %rax, result(%rip)    # store rax to result
-  movq result(%rip), %rdi    # load result into rdi
+It COMPUTES an address but DOESN'T access memory.
+Programmers abuse this for fast arithmetic!
 
-First we store, then we load it back. The exit code will be 77.
+
+THE SYNTAX
+
+  leaq EXPRESSION, DEST
+
+The expression uses memory addressing syntax:
+  offset(base, index, scale)
+  = base + (index * scale) + offset
+
+Scale can only be 1, 2, 4, or 8.
+
+
+LEA FOR ARITHMETIC
+
+  leaq (%rdi, %rsi), %rax        # rax = rdi + rsi
+  leaq 1(%rdi), %rax             # rax = rdi + 1
+  leaq (%rdi, %rdi, 2), %rax     # rax = rdi + rdi*2 = rdi*3
+  leaq (%rdi, %rdi, 4), %rax     # rax = rdi + rdi*4 = rdi*5
+
+
+WHY USE LEA?
+
+1. Doesn't modify flags (add/sub do)
+2. Can compute in one instruction
+3. Result can go to any register (not just the source)
+
+
+MULTIPLY BY COMMON VALUES
+
+  *2:  leaq (%rdi, %rdi), %rax       # rdi + rdi
+  *3:  leaq (%rdi, %rdi, 2), %rax    # rdi + rdi*2
+  *4:  leaq (,%rdi, 4), %rax         # rdi*4
+  *5:  leaq (%rdi, %rdi, 4), %rax    # rdi + rdi*4
+  *8:  leaq (,%rdi, 8), %rax         # rdi*8
+  *9:  leaq (%rdi, %rdi, 8), %rax    # rdi + rdi*8
+
+
+YOUR TASK
+
+Multiply %rdi by 5 using LEA.
+
+x * 5 = x + x*4
+
+So: leaq (%rdi, %rdi, 4), DEST
+
+The result should end up in %rdi for the exit syscall.

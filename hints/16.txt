@@ -1,26 +1,55 @@
-Exercise 16: Conditional Jumps
+════════════════════════════════════════
+LESSON 16: Loading Data from Memory
+════════════════════════════════════════
 
-After cmpq, you can jump based on the result:
-  je   - jump if equal
-  jne  - jump if not equal
-  jl   - jump if less (signed)
-  jg   - jump if greater (signed)
-  jle  - jump if less or equal
-  jge  - jump if greater or equal
+DATA IN MEMORY
 
-HOW CMP WORKS:
-  cmpq $B, %A computes A - B
+Programs can store data in the .data section. This data persists in memory
+and can be read/written at runtime.
 
-If A < B, the result is negative -> jl jumps
-If A > B, the result is positive -> jg jumps
-If A == B, the result is zero -> je jumps
+  .section .data
+  myvar: .quad 42        # 64-bit value initialized to 42
 
-THE PROBLEM:
-We're comparing 10 with 20: cmpq $20, %rax
-This computes 10 - 20 = -10 (negative).
-Is 10 less than 20? Yes! So we want jl.
 
-TO COMPLETE:
-Change "jmp less" to "jl less".
+LOADING FROM MEMORY
 
-jmp always jumps. jl only jumps if less than.
+To load a value from a labeled memory location:
+
+  movq label(%rip), %rax
+
+The (%rip) is crucial - it makes the address "RIP-relative" (position
+independent). This is required for modern executables with ASLR.
+
+
+DATA TYPES
+
+  .byte   1 byte (8 bits)
+  .word   2 bytes (16 bits)
+  .long   4 bytes (32 bits)
+  .quad   8 bytes (64 bits)
+
+
+RIP-RELATIVE ADDRESSING
+
+  label(%rip)
+
+This means: "the address of 'label' relative to the current instruction"
+
+The assembler calculates the offset automatically. You just write label(%rip).
+
+
+EXAMPLE
+
+  .section .data
+  secret: .quad 42
+
+  .section .text
+  _start:
+      movq secret(%rip), %rdi    # Load value at 'secret' into rdi
+
+
+YOUR TASK
+
+Load the value stored at 'secret' into %rdi.
+
+Use: movq label(%rip), %register

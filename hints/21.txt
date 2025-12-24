@@ -1,26 +1,52 @@
-Exercise 21: Stack Frames
+════════════════════════════════════════
+LESSON 21: Conditional Jumps
+════════════════════════════════════════
 
-A stack frame is the region of stack used by a function.
-The standard prologue/epilogue:
+THE FULL SET
 
-PROLOGUE (at function start):
-  pushq %rbp          # save old base pointer
-  movq %rsp, %rbp     # set new base pointer
+After cmpq $B, %A (which computes A - B):
 
-EPILOGUE (before return):
-  popq %rbp           # restore old base pointer
-  ret
+  Signed comparisons:
+    je   Jump if A == B    (Equal)
+    jne  Jump if A != B    (Not Equal)
+    jl   Jump if A < B     (Less)
+    jle  Jump if A <= B    (Less or Equal)
+    jg   Jump if A > B     (Greater)
+    jge  Jump if A >= B    (Greater or Equal)
 
-%rbp (base pointer) marks the bottom of our frame.
-This creates a stable reference point for local variables.
+  Unsigned comparisons:
+    jb   Jump if A < B     (Below)
+    jbe  Jump if A <= B    (Below or Equal)
+    ja   Jump if A > B     (Above)
+    jae  Jump if A >= B    (Above or Equal)
 
-THE PROBLEM:
-Complete the prologue and epilogue in my_func.
 
-TO COMPLETE:
-Add the prologue:
-  pushq %rbp
-  movq %rsp, %rbp
+SIGNED VS UNSIGNED
 
-And the epilogue (before ret):
-  popq %rbp
+For positive numbers, signed and unsigned are the same.
+The difference matters with negative numbers or large values.
+
+Use jl/jg for int (signed).
+Use jb/ja for size_t, pointers (unsigned).
+
+
+UNCONDITIONAL JUMP
+
+  jmp label     # Always jumps (no condition)
+
+
+THE CODE
+
+  cmpq $20, %rax     # 10 - 20 = -10 (negative)
+
+  10 is LESS than 20.
+
+  Currently it uses "jmp" which ALWAYS jumps.
+  You need a CONDITIONAL jump that only jumps when less-than is true.
+
+
+YOUR TASK
+
+Replace "jmp" with the correct conditional jump for "less than" (signed).
+
+Which jump instruction checks for "less than"?

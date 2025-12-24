@@ -1,0 +1,66 @@
+════════════════════════════════════════
+LESSON 36: Debugging Syscall Arguments
+════════════════════════════════════════
+
+SYSCALL ARGUMENT REGISTERS
+
+For the write syscall:
+  %rax = 1 (syscall number)
+  %rdi = file descriptor
+  %rsi = buffer address
+  %rdx = length
+
+Each argument has a SPECIFIC register. Mix them up and it fails!
+
+
+COMMON BUGS
+
+1. Wrong syscall number:
+   %rax = 0 is read, %rax = 1 is write
+   Using 0 when you want to write = nothing happens
+
+2. Swapped buffer and length:
+   %rsi should be the ADDRESS (pointer to data)
+   %rdx should be the LENGTH (number of bytes)
+   Swapping them causes garbage or crashes
+
+3. Wrong register entirely:
+   leaq msg(%rip), %rdx  # Wrong! Buffer should go in %rsi
+
+
+THE CHECKLIST
+
+Before every syscall, verify:
+  □ %rax = correct syscall number (1 for write)
+  □ %rdi = file descriptor (1 for stdout)
+  □ %rsi = pointer to buffer
+  □ %rdx = byte count
+
+
+READING THE CODE
+
+  movq $0, %rax           # What syscall is this?
+  movq $1, %rdi           # Correct fd for stdout
+  leaq msg(%rip), %rdx    # Is this the right register for buffer?
+  movq $2, %rsi           # Is this the right register for length?
+
+The values are correct, but are they in the RIGHT REGISTERS?
+
+
+DEBUGGING TECHNIQUE
+
+Draw a table:
+  | Register | Expected | Actual   |
+  |----------|----------|----------|
+  | %rax     | 1        | 0        | ← wrong!
+  | %rdi     | 1        | 1        | ✓
+  | %rsi     | buffer   | 2        | ← swapped!
+  | %rdx     | 2        | buffer   | ← swapped!
+
+
+YOUR TASK
+
+Find and fix THREE bugs:
+  1. What syscall number should %rax have?
+  2. What should %rsi contain?
+  3. What should %rdx contain?

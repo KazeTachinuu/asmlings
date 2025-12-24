@@ -1,21 +1,64 @@
-Exercise 23: Local Variables
+════════════════════════════════════════
+LESSON 23: Loop Construction
+════════════════════════════════════════
 
-Local variables live on the stack, addressed relative to %rbp:
-  -8(%rbp)   = first local (8 bytes)
-  -16(%rbp)  = second local (8 bytes)
-  etc.
+WHAT IS A LOOP?
 
-The subq $16, %rsp allocates space for them.
+A loop is just:
+  1. Do some work
+  2. Check a condition
+  3. Jump back if condition is true
 
-THE PROBLEM:
-Store 10 at -8(%rbp), 20 at -16(%rbp), add them to %rdi.
 
-TO COMPLETE:
-Add these instructions in the function body:
+THE PATTERN
 
-  movq $10, -8(%rbp)      # store 10
-  movq $20, -16(%rbp)     # store 20
-  movq -8(%rbp), %rdi     # load first
-  addq -16(%rbp), %rdi    # add second
+  movq $N, %rcx           # Initialize counter
 
-Result: %rdi = 10 + 20 = 30
+loop_start:
+  # ... do work ...
+
+  decq %rcx               # counter--
+  jnz loop_start          # if counter != 0, repeat
+
+
+DECQ
+
+  decq %rcx
+
+Decrements %rcx by 1 AND sets flags.
+If the result is zero, ZF = 1.
+
+
+JNZ
+
+  jnz label
+
+"Jump if Not Zero" - jumps if ZF = 0.
+
+Together: decq + jnz loops until counter reaches 0.
+
+
+EQUIVALENT C
+
+  for (int i = N; i > 0; i--) {
+      // do work
+  }
+
+
+THE CODE
+
+You have:
+  - Result accumulator: %rdi (starts at 0)
+  - Loop counter: %rcx (starts at 5)
+  - Loop body: addq $1, %rdi
+
+You need to add:
+  - Decrement the counter
+  - Jump back if not zero
+
+
+YOUR TASK
+
+After addq $1, %rdi, add two instructions:
+  1. Decrement %rcx
+  2. Jump to loop_start if %rcx is not zero

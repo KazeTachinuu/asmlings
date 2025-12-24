@@ -1,25 +1,54 @@
-Exercise 22: Stack Alignment
+════════════════════════════════════════
+LESSON 22: The TEST Instruction
+════════════════════════════════════════
 
-The System V AMD64 ABI requires the stack to be 16-byte aligned
-before a 'call' instruction.
+TEST vs CMP
 
-WHY IT MATTERS:
-- SSE instructions require 16-byte alignment
-- C library functions expect it
-- Crashes can happen without it
+  cmpq A, B     Computes B - A, sets flags
+  testq A, B    Computes B & A (AND), sets flags
 
-HOW IT WORKS:
-At function entry, after 'call' pushed the return address (8 bytes),
-%rsp is 8 mod 16. After pushq %rbp (another 8 bytes), it's aligned!
+Both discard the result. Only flags matter.
 
-For local variables, always allocate in multiples of 16.
 
-THE PROBLEM:
-We need 16 bytes for locals. The function has the prologue but
-is missing the stack allocation.
+THE ZERO-CHECK IDIOM
 
-TO COMPLETE:
-Add this after movq %rsp, %rbp:
-  subq $16, %rsp
+  testq %rax, %rax
 
-This allocates 16 bytes, keeping the stack aligned.
+Computes RAX & RAX = RAX (AND with itself is identity).
+Sets ZF = 1 if RAX is zero.
+
+This is THE standard way to check if a register is zero.
+
+
+WHY NOT CMP?
+
+  cmpq $0, %rax     # 7+ bytes
+  testq %rax, %rax  # 3 bytes
+
+Same result, but test is shorter and often faster.
+
+
+AFTER TEST
+
+  testq %rdi, %rdi
+  jz is_zero        # Jump if Zero (ZF = 1)
+  jnz not_zero      # Jump if Not Zero (ZF = 0)
+
+Note: jz and je are the same instruction!
+      jnz and jne are the same instruction!
+
+
+OTHER TEST USES
+
+  testq $1, %rax    # Check if bit 0 is set (odd/even)
+  testq $0x80, %al  # Check if high bit of byte is set
+
+
+YOUR TASK
+
+Check if %rdi is zero using test.
+If zero, jump to 'is_zero'.
+
+Two instructions:
+  testq ???, ???
+  jz ???

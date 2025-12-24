@@ -1,21 +1,63 @@
-Exercise 18: Push and Pop
+════════════════════════════════════════
+LESSON 18: Working with Bytes
+════════════════════════════════════════
 
-The stack is a LIFO (Last-In-First-Out) data structure.
-It grows DOWNWARD in memory.
+NOT EVERYTHING IS 64 BITS
 
-  pushq %rax    # push rax onto stack (rsp -= 8)
-  popq %rax     # pop top into rax (rsp += 8)
+Strings are made of 8-bit characters (bytes).
+When working with strings, you need byte-level operations.
 
-%rsp (stack pointer) always points to the top of the stack.
 
-THE PROBLEM:
-We push 42, then push 99.
-Stack: [42, 99] <- 99 is on top
-First pop gets 99, second pop gets 42.
+THE PROBLEM WITH MOVB
 
-TO COMPLETE:
-Add these instructions:
-  popq %rax     # get 99 (we don't need it)
-  popq %rdi     # get 42 (this is what we want)
+  movb (%rsi), %dil      # Load byte into dil (low 8 bits of rdi)
 
-Or you could pop into any register for the first one.
+This ONLY sets the low 8 bits. The upper 56 bits keep their old value!
+This can cause bugs if those bits aren't already zero.
+
+
+ZERO-EXTEND: MOVZBL
+
+  movzbl (%rsi), %edi
+
+"Move Zero-extend Byte to Long"
+  - Reads 1 byte from memory
+  - Puts it in the low 8 bits of the destination
+  - Fills the rest with ZEROS
+
+Using %edi (32-bit) as destination also clears the upper 32 bits of %rdi!
+
+
+SIGN-EXTEND: MOVSBL
+
+  movsbl (%rsi), %edi
+
+"Move Sign-extend Byte to Long"
+  - Reads 1 byte from memory
+  - Extends the sign bit to fill the destination
+
+Use this for signed values (like -1 as a char).
+
+
+ASCII
+
+Characters are stored as ASCII codes:
+  'A' = 65
+  'B' = 66
+  'a' = 97
+  '0' = 48
+
+
+THE .RODATA SECTION
+
+Read-only data (strings, constants):
+
+  .section .rodata
+  msg: .ascii "ABC"       # Three bytes: 65, 66, 67
+
+
+YOUR TASK
+
+Load the first byte of 'data' (which is 'A' = 65) into %edi.
+
+Use movzbl with the address in %rsi.

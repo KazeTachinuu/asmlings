@@ -65,81 +65,80 @@ get_hint:
 
 hint_default: .asciz "No hint available for this exercise."
 
-# Get expected exit code for exercise
-# rdi = exercise path
-# Returns: expected exit code in eax
+# Get expected exit code by parsing "Expected exit code: N" from source
+# Assumes source_buffer already contains the file content (from file_has_marker)
+# rdi = exercise path (unused, kept for compatibility)
+# Returns: exit code in eax (0-255), or 256 if "???" or not found
 get_expected_exit:
     push rbx
-    call get_filename_ptr
+    push r12
+
+    # Search for "Expected exit code:" in source_buffer
+    lea rdi, [rip + source_buffer]
+    lea rsi, [rip + marker_expected]
+    call str_find
+    test rax, rax
+    jz .gee_not_found
+
+    # Found it - skip past the prefix (19 chars: "Expected exit code:")
+    add rax, 19
     mov rbx, rax
 
-    # Parse two-digit number from filename
+    # Skip whitespace
+.gee_skip_ws:
+    movzx ecx, byte ptr [rbx]
+    cmp cl, ' '
+    je .gee_next_ws
+    cmp cl, '\t'
+    je .gee_next_ws
+    jmp .gee_check_predict
+
+.gee_next_ws:
+    inc rbx
+    jmp .gee_skip_ws
+
+.gee_check_predict:
+    # Check if it's "???" (prediction not filled)
+    cmp byte ptr [rbx], '?'
+    jne .gee_parse_num
+    cmp byte ptr [rbx + 1], '?'
+    jne .gee_parse_num
+    cmp byte ptr [rbx + 2], '?'
+    jne .gee_parse_num
+    # It's "???" - return 256
+    mov eax, 256
+    jmp .gee_done
+
+.gee_parse_num:
+    # Check if first char is a digit
     movzx ecx, byte ptr [rbx]
     sub ecx, '0'
     cmp ecx, 9
-    ja .gee_default
-    imul ecx, 10
+    ja .gee_not_found       # not a digit, no valid number
 
-    movzx edx, byte ptr [rbx + 1]
-    sub edx, '0'
-    cmp edx, 9
-    ja .gee_default
-    add ecx, edx
+    # Parse decimal number
+    xor r12d, r12d          # accumulator
 
-    # ecx now has exercise number
-    cmp ecx, EXERCISE_COUNT
-    ja .gee_default
-    cmp ecx, 1
-    jb .gee_default
+.gee_digit_loop:
+    movzx ecx, byte ptr [rbx]
+    sub ecx, '0'
+    cmp ecx, 9
+    ja .gee_end_num         # not a digit, done
+    imul r12d, r12d, 10
+    add r12d, ecx
+    inc rbx
+    jmp .gee_digit_loop
 
-    lea rdx, [rip + exit_code_table]
-    movzx eax, byte ptr [rdx + rcx]
+.gee_end_num:
+    # Return the parsed number (0-255)
+    mov eax, r12d
+    jmp .gee_done
+
+.gee_not_found:
+    # No "Expected exit code:" found - return 256
+    mov eax, 256
+
+.gee_done:
+    pop r12
     pop rbx
     ret
-
-.gee_default:
-    xor eax, eax
-    pop rbx
-    ret
-
-# =============================================================================
-# EXIT CODE TABLE
-# =============================================================================
-# To add a new exercise:
-#   1. Create exercises/NN_name.s
-#   2. Create hints/NN.txt
-#   3. Add expected exit code below
-#   4. Update EXERCISE_COUNT in constants.s
-# =============================================================================
-exit_code_table:
-    .byte 0     # 0: unused
-    .byte 0     # 01: intro
-    .byte 42    # 02: exit_code
-    .byte 25    # 03: mov
-    .byte 99    # 04: registers
-    .byte 42    # 05: add
-    .byte 77    # 06: sub
-    .byte 56    # 07: mul (7*8)
-    .byte 33    # 08: div (99/3)
-    .byte 52    # 09: and (0x34)
-    .byte 53    # 10: or (0x35)
-    .byte 0     # 11: xor
-    .byte 40    # 12: shifts (5*8)
-    .byte 123   # 13: memory
-    .byte 77    # 14: store
-    .byte 0     # 15: cmp
-    .byte 1     # 16: jumps
-    .byte 5     # 17: loop
-    .byte 42    # 18: push_pop
-    .byte 55    # 19: stack_save
-    .byte 66    # 20: call_ret
-    .byte 88    # 21: stack_frame
-    .byte 0     # 22: alignment
-    .byte 30    # 23: locals
-    .byte 44    # 24: args
-    .byte 73    # 25: callee_save
-    .byte 0     # 26: write
-    .byte 5     # 27: read
-    .byte 5     # 28: string_len
-    # Add new exercises here:
-    # .byte N   # 29: new_exercise

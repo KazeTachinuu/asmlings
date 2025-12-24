@@ -1,23 +1,47 @@
-Exercise 11: Bitwise XOR
+════════════════════════════════════════
+LESSON 11: Bitwise OR - Combining Values
+════════════════════════════════════════
 
-XOR (exclusive or) returns 1 if bits are DIFFERENT.
+OR OPERATION
 
-  1 XOR 1 = 0
-  1 XOR 0 = 1
-  0 XOR 1 = 1
-  0 XOR 0 = 0
+  orq SOURCE, DEST   →   DEST = DEST | SOURCE
 
-MAGIC PROPERTY:
-X XOR X = 0 (anything XOR itself is 0!)
+OR produces 1 if EITHER bit is 1:
 
-This means xorq %rax, %rax sets %rax to 0.
-It's the fastest way to zero a register.
+  1 OR 1 = 1
+  1 OR 0 = 1
+  0 OR 1 = 1
+  0 OR 0 = 0
 
-THE PROBLEM:
-Zero %rdi using XOR.
 
-TO COMPLETE:
-Add this instruction:
-  xorq %rdi, %rdi
+USES OF OR
 
-This computes rdi = rdi XOR rdi = 0.
+1. Combining values:
+   0x30 = 0011 0000
+   0x05 = 0000 0101
+   OR   = 0011 0101 = 0x35
+
+2. Setting specific bits:
+   value | 0x80 sets the high bit of a byte
+
+3. Combining flags:
+   O_WRONLY | O_CREAT = open for write + create if needed
+
+
+THE PROBLEM
+
+You have:
+  %rdi = 0x30 = 48 decimal
+  %rsi = 0x05 = 5 decimal
+
+Combine them with OR to get:
+  0x35 = 53 decimal
+
+
+YOUR TASK
+
+Use OR to combine %rsi into %rdi.
+
+  orq SOURCE, DEST
+
+Which is source? Which is destination?

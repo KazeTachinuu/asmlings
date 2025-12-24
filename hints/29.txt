@@ -1,0 +1,69 @@
+════════════════════════════════════════
+LESSON 29: Functions - Call and Return
+════════════════════════════════════════
+
+WHAT IS A FUNCTION?
+
+A reusable block of code that can be "called" from anywhere
+and "returns" back when done.
+
+
+THE CALL INSTRUCTION
+
+  call my_function
+
+This does TWO things:
+  1. PUSH the return address (address of the next instruction)
+  2. JUMP to my_function
+
+The return address is where execution should resume after the function.
+
+
+THE RET INSTRUCTION
+
+  ret
+
+This does:
+  1. POP the return address from the stack
+  2. JUMP to that address
+
+Together, call and ret implement function calls.
+
+
+VISUALIZING CALL/RET
+
+  _start:
+      movq $5, %rdi           # Line 1
+      call my_func            # Line 2 - pushes address of line 3
+      movq %rax, %rdi         # Line 3 - return address
+      ...
+
+  my_func:
+      addq $10, %rdi          # Line 4
+      ret                     # Line 5 - pops and jumps to line 3
+
+
+THE STACK DURING A CALL
+
+  Before call:   Stack: [...]
+  After call:    Stack: [...][return_addr]    <- RSP points here
+  At ret:        Stack: [...][return_addr]    <- pop this
+  After ret:     Stack: [...]                 <- back to normal
+
+
+WRITING A SIMPLE FUNCTION
+
+A function is just a label followed by code and ending with ret:
+
+  my_func:              # Label marks the entry point
+      # ... do work ...
+      ret               # Return to caller
+
+
+YOUR TASK
+
+Write a function called 'set_value' that:
+  1. Puts a value in %rdi
+  2. Returns to the caller
+
+What two things does your function need?

@@ -1,26 +1,55 @@
-Exercise 10: Bitwise OR
+════════════════════════════════════════
+LESSON 10: Bitwise AND - Masking
+════════════════════════════════════════
 
-OR compares bits pair by pair.
-Result is 1 if EITHER (or both) bits is 1.
+BITWISE OPERATIONS
 
-  1 OR 1 = 1
-  1 OR 0 = 1
-  0 OR 1 = 1
-  0 OR 0 = 0
+Bitwise operations work on individual bits, comparing them pair by pair.
 
-COMBINING VALUES:
-OR is used to set bits or combine flags.
 
-EXAMPLE:
-  0x30 = 0011 0000
-  0x05 = 0000 0101
-  OR   = 0011 0101 = 0x35 = 53
+AND OPERATION
 
-THE PROBLEM:
-Combine 0x30 and 0x05 to get 53.
+  andq SOURCE, DEST   →   DEST = DEST & SOURCE
 
-TO COMPLETE:
-Add this instruction:
-  orq %rsi, %rdi
+AND produces 1 only if BOTH bits are 1:
 
-This ORs rsi into rdi: rdi = rdi | rsi = 0x30 | 0x05 = 0x35
+  1 AND 1 = 1
+  1 AND 0 = 0
+  0 AND 1 = 0
+  0 AND 0 = 0
+
+
+MASKING
+
+AND is used to "mask" bits - keeping only certain bits while zeroing others.
+
+A mask of 0xFF (binary: 11111111) keeps the lowest 8 bits:
+
+  Value:  0x1234   = 0001 0010 0011 0100
+  Mask:   0x00FF   = 0000 0000 1111 1111
+  Result: 0x0034   = 0000 0000 0011 0100
+
+The high bits become 0, the low 8 bits are preserved.
+
+
+COMMON MASKS
+
+  0x0F      Keep lowest 4 bits (one hex digit)
+  0xFF      Keep lowest 8 bits (one byte)
+  0xFFFF    Keep lowest 16 bits (two bytes)
+  0xFFFFFF  Keep lowest 24 bits (three bytes)
+
+
+THE PROBLEM
+
+You have 0x1234 in %rdi.
+You need to extract just the low byte: 0x34 = 52 decimal.
+
+
+YOUR TASK
+
+Apply an AND mask to keep only the lowest 8 bits.
+
+  andq $MASK, %rdi
+
+What should MASK be?

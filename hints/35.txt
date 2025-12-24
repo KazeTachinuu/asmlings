@@ -1,0 +1,69 @@
+════════════════════════════════════════
+LESSON 35: sys_read - Read from Input
+════════════════════════════════════════
+
+THE READ SYSCALL
+
+Syscall number: 0 (goes in %rax)
+
+Arguments:
+  %rdi = file descriptor (0 = stdin for keyboard input)
+  %rsi = pointer to buffer (where to store data)
+  %rdx = maximum bytes to read
+
+Returns: number of bytes actually read (in %rax)
+
+
+WHY "MAXIMUM BYTES"?
+
+read() is not guaranteed to read that many bytes.
+It reads UP TO that amount, or until end of input.
+
+The return value tells you how many bytes were actually read.
+This is crucial for knowing how much valid data you have!
+
+
+THE .BSS SECTION
+
+  .section .bss
+  buffer: .skip 64
+
+.bss is for uninitialized data. It reserves space without
+taking up room in the executable. Perfect for input buffers.
+
+.skip 64 reserves 64 bytes.
+
+
+THE .RODATA SECTION
+
+  .section .rodata
+  msg: .ascii "Hello"
+
+.rodata is for read-only data like string constants.
+The assembler includes this data in the executable.
+
+
+RIP-RELATIVE ADDRESSING
+
+  leaq buffer(%rip), %rsi
+
+This loads the address of 'buffer' into %rsi.
+%rip is the instruction pointer - this is position-independent code.
+
+
+READING INPUT
+
+  echo "hello" | ./program
+
+The "hello" (5 bytes) plus newline (1 byte) = 6 bytes.
+read() returns 6, which becomes the exit code.
+
+
+YOUR TASK
+
+This exercise is already complete! Study how:
+  - .bss reserves buffer space
+  - read syscall is set up
+  - Return value (%rax) is used as exit code
+
+Then remove the marker.

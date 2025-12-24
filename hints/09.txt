@@ -1,25 +1,50 @@
-Exercise 09: Bitwise AND
+════════════════════════════════════════
+LESSON 09: Division - The Tricky One
+════════════════════════════════════════
 
-AND compares bits pair by pair.
-Result is 1 only if BOTH bits are 1.
+WHY IS DIVISION SPECIAL?
 
-  1 AND 1 = 1
-  1 AND 0 = 0
-  0 AND 1 = 0
-  0 AND 0 = 0
+Division in x86 is weird because it works with a 128-bit dividend!
 
-MASKING:
-AND is used to "mask" bits - keeping only certain bits.
-0xFF = 11111111 in binary = keeps lowest 8 bits.
+The CPU divides the 128-bit number in RDX:RAX (RDX is high 64 bits,
+RAX is low 64 bits) by your divisor.
 
-EXAMPLE:
-  0x1234 = 0001 0010 0011 0100
-  0x00FF = 0000 0000 1111 1111
-  Result = 0000 0000 0011 0100 = 0x34 = 52
 
-THE PROBLEM:
-Extract the low byte from 0x1234 to get 52.
+THE DIV INSTRUCTION
 
-TO COMPLETE:
-Add this instruction:
-  andq $0xFF, %rdi
+  divq DIVISOR
+
+Performs:
+  RAX = (RDX:RAX) / DIVISOR   (quotient)
+  RDX = (RDX:RAX) % DIVISOR   (remainder)
+
+
+THE CRITICAL STEP
+
+For simple division where your dividend fits in 64 bits:
+
+  YOU MUST CLEAR RDX TO ZERO FIRST!
+
+If RDX has garbage, you're dividing a huge random number.
+
+
+THE PATTERN
+
+  xorq %rdx, %rdx     # Step 1: Clear RDX (set to 0)
+  movq $100, %rax     # Step 2: Put dividend in RAX
+  movq $4, %rcx       # Step 3: Put divisor in any register
+  divq %rcx           # Step 4: Divide!
+  # Now: RAX = quotient, RDX = remainder
+
+
+AFTER DIVISION
+
+  RAX = quotient (the answer you usually want)
+  RDX = remainder (useful for modulo operations)
+
+
+YOUR TASK
+
+Calculate 100 / 4 = 25
+
+Follow the four steps. Make sure you clear RDX first!

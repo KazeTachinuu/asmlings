@@ -585,6 +585,204 @@ TEST(all_complete_message) {
 }
 
 /* ============================================================
+ * OUTPUT VERIFICATION TESTS
+ * ============================================================ */
+
+/* Create exercise with expected output */
+static void create_exercise_output(const char *name, const char *code, int with_marker, const char *expected_out) {
+    char path[512];
+    snprintf(path, sizeof(path), "%s/exercises/%s", test_dir, name);
+
+    FILE *fp = fopen(path, "w");
+    if (!fp) return;
+
+    fprintf(fp, "# Test exercise\n");
+    if (with_marker) {
+        fprintf(fp, "# I AM NOT DONE\n");
+    }
+    fprintf(fp, "# Expected output: \"%s\"\n", expected_out);
+    fprintf(fp, "# Expected exit code: 0\n\n");
+    fprintf(fp, "%s", code);
+    fclose(fp);
+}
+
+/* Create predict exercise with ??? */
+static void create_predict_exercise(const char *name, const char *code, int with_marker, const char *predict_val) {
+    char path[512];
+    snprintf(path, sizeof(path), "%s/exercises/%s", test_dir, name);
+
+    FILE *fp = fopen(path, "w");
+    if (!fp) return;
+
+    fprintf(fp, "# Test predict exercise\n");
+    if (with_marker) {
+        fprintf(fp, "# I AM NOT DONE\n");
+    }
+    fprintf(fp, "# Expected exit code: %s\n\n", predict_val);
+    fprintf(fp, "%s", code);
+    fclose(fp);
+}
+
+TEST(output_correct_passes) {
+    setup_test_env();
+
+    /* Exercise that outputs "Hi" and expects "Hi" */
+    create_exercise_output("01_test.s",
+        ".global _start\n"
+        ".section .rodata\n"
+        "msg: .ascii \"Hi\"\n"
+        ".section .text\n"
+        "_start:\n"
+        "    mov $1, %rax\n"
+        "    mov $1, %rdi\n"
+        "    lea msg(%rip), %rsi\n"
+        "    mov $2, %rdx\n"
+        "    syscall\n"
+        "    mov $60, %rax\n"
+        "    xor %rdi, %rdi\n"
+        "    syscall\n",
+        0, "Hi");
+
+    char out[8192];
+    run_asmlings("list", out, sizeof(out), NULL);
+
+    teardown_test_env();
+
+    ASSERT_STR(out, "1/1", "correct output should pass");
+    return 1;
+}
+
+TEST(output_wrong_fails) {
+    setup_test_env();
+
+    /* Exercise outputs "Yo" but expects "Hi" */
+    create_exercise_output("01_test.s",
+        ".global _start\n"
+        ".section .rodata\n"
+        "msg: .ascii \"Yo\"\n"
+        ".section .text\n"
+        "_start:\n"
+        "    mov $1, %rax\n"
+        "    mov $1, %rdi\n"
+        "    lea msg(%rip), %rsi\n"
+        "    mov $2, %rdx\n"
+        "    syscall\n"
+        "    mov $60, %rax\n"
+        "    xor %rdi, %rdi\n"
+        "    syscall\n",
+        0, "Hi");
+
+    char out[8192];
+    run_asmlings("list", out, sizeof(out), NULL);
+
+    teardown_test_env();
+
+    ASSERT_STR(out, "0/1", "wrong output should fail");
+    return 1;
+}
+
+TEST(output_shows_expected_actual) {
+    setup_test_env();
+
+    create_exercise_output("01_test.s",
+        ".global _start\n"
+        ".section .rodata\n"
+        "msg: .ascii \"Yo\"\n"
+        ".section .text\n"
+        "_start:\n"
+        "    mov $1, %rax\n"
+        "    mov $1, %rdi\n"
+        "    lea msg(%rip), %rsi\n"
+        "    mov $2, %rdx\n"
+        "    syscall\n"
+        "    mov $60, %rax\n"
+        "    xor %rdi, %rdi\n"
+        "    syscall\n",
+        0, "Hi");
+
+    char out[8192];
+    run_asmlings("watch", out, sizeof(out), NULL);
+
+    teardown_test_env();
+
+    ASSERT_STR(out, "Wrong output", "should show wrong output message");
+    ASSERT_STR(out, "Expected", "should show expected label");
+    ASSERT_STR(out, "Got", "should show actual label");
+    return 1;
+}
+
+/* ============================================================
+ * PREDICT EXERCISE TESTS
+ * ============================================================ */
+
+TEST(predict_unfilled_not_done) {
+    setup_test_env();
+
+    /* Predict exercise with ??? (not filled in yet) */
+    create_predict_exercise("01_predict.s",
+        ".global _start\n"
+        ".text\n"
+        "_start:\n"
+        "    mov $60, %rax\n"
+        "    mov $42, %rdi\n"
+        "    syscall\n",
+        0, "???");
+
+    char out[8192];
+    run_asmlings("list", out, sizeof(out), NULL);
+
+    teardown_test_env();
+
+    ASSERT_STR(out, "0/1", "??? should be treated as not done");
+    return 1;
+}
+
+TEST(predict_correct_passes) {
+    setup_test_env();
+
+    /* Predict exercise with correct answer filled in */
+    create_predict_exercise("01_predict.s",
+        ".global _start\n"
+        ".text\n"
+        "_start:\n"
+        "    mov $60, %rax\n"
+        "    mov $42, %rdi\n"
+        "    syscall\n",
+        0, "42");
+
+    char out[8192];
+    run_asmlings("list", out, sizeof(out), NULL);
+
+    teardown_test_env();
+
+    ASSERT_STR(out, "1/1", "correct prediction should pass");
+    return 1;
+}
+
+TEST(predict_wrong_no_answer) {
+    setup_test_env();
+
+    /* Predict exercise with wrong answer - should not reveal correct answer */
+    create_predict_exercise("01_predict.s",
+        ".global _start\n"
+        ".text\n"
+        "_start:\n"
+        "    mov $60, %rax\n"
+        "    mov $42, %rdi\n"
+        "    syscall\n",
+        0, "99");
+
+    char out[8192];
+    run_asmlings("watch", out, sizeof(out), NULL);
+
+    teardown_test_env();
+
+    ASSERT_STR(out, "Wrong prediction", "should show wrong prediction message");
+    ASSERT_NOT_STR(out, "expected 42", "should NOT reveal the answer");
+    return 1;
+}
+
+/* ============================================================
  * ERROR MESSAGE TESTS
  * ============================================================ */
 
@@ -689,6 +887,16 @@ int main(void) {
     RUN_TEST(progress_counts_correct);
     RUN_TEST(progress_shows_percentage);
     RUN_TEST(all_complete_message);
+
+    print_section("Output Verification");
+    RUN_TEST(output_correct_passes);
+    RUN_TEST(output_wrong_fails);
+    RUN_TEST(output_shows_expected_actual);
+
+    print_section("Predict Exercises");
+    RUN_TEST(predict_unfilled_not_done);
+    RUN_TEST(predict_correct_passes);
+    RUN_TEST(predict_wrong_no_answer);
 
     print_section("Error Messages");
     RUN_TEST(shows_wrong_exit_message);

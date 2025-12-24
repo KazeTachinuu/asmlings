@@ -1,0 +1,85 @@
+════════════════════════════════════════
+LESSON 38: Final Challenge - Implement cat
+════════════════════════════════════════
+
+THE GOAL
+
+Implement a simple "cat" program that:
+  1. Reads data from stdin
+  2. Writes that data to stdout
+  3. Exits cleanly
+
+This combines everything you've learned about syscalls!
+
+
+THE READ SYSCALL (0)
+
+  movq $0, %rax           # syscall number (read)
+  movq $0, %rdi           # fd = stdin
+  leaq buffer(%rip), %rsi # buffer address
+  movq $1024, %rdx        # max bytes to read
+  syscall
+
+After syscall, %rax contains the number of bytes actually read.
+
+
+THE WRITE SYSCALL (1)
+
+  movq $1, %rax           # syscall number (write)
+  movq $1, %rdi           # fd = stdout
+  leaq buffer(%rip), %rsi # buffer address
+  movq %rdx, %rdx         # length (bytes to write)
+  syscall
+
+
+THE KEY CHALLENGE
+
+After read, %rax has the byte count. But when you set up write,
+you overwrite %rax with the syscall number!
+
+You must SAVE the byte count before setting up write.
+
+Options:
+  1. Move to another register:  movq %rax, %rdx
+  2. Push to stack:             pushq %rax ... popq %rdx
+
+
+A SOLUTION STRATEGY
+
+  # Read
+  movq $0, %rax           # read syscall
+  movq $0, %rdi           # stdin
+  leaq buffer(%rip), %rsi # buffer
+  movq $1024, %rdx        # max bytes
+  syscall
+
+  # %rax now has bytes read - save it!
+  movq %rax, %rdx         # Save byte count for write
+
+  # Write
+  movq $1, %rax           # write syscall
+  movq $1, %rdi           # stdout
+  leaq buffer(%rip), %rsi # buffer (same as read)
+  # %rdx already has the length!
+  syscall
+
+
+REGISTER PLANNING
+
+Before write syscall:
+  | Register | Needed Value  | Source                |
+  |----------|---------------|----------------------|
+  | %rax     | 1             | Immediate            |
+  | %rdi     | 1             | Immediate            |
+  | %rsi     | buffer addr   | leaq buffer(%rip)    |
+  | %rdx     | bytes read    | Saved from read %rax |
+
+
+YOUR TASK
+
+1. Set up and execute the read syscall
+2. Save the bytes-read count somewhere safe
+3. Set up and execute the write syscall
+4. Exit with code 0
+
+Congratulations on completing the asmlings course!

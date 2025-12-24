@@ -1,18 +1,49 @@
-Exercise 05: Addition
+════════════════════════════════════════
+LESSON 05: The ADD Instruction
+════════════════════════════════════════
 
-add performs addition: addq SOURCE, DESTINATION
-The result is stored in DESTINATION.
+ADDITION IN ASSEMBLY
 
-EXAMPLES:
-  addq $10, %rax    # rax = rax + 10
-  addq %rbx, %rax   # rax = rax + rbx
+  addq SOURCE, DEST
 
-THE PROBLEM:
-We have 10 in %rdi and need 42.
-42 - 10 = 32, so we need to add 32.
+This computes:  DEST = DEST + SOURCE
 
-TO COMPLETE:
-Add this instruction:
-  addq $32, %rdi
+The result REPLACES the destination. The source is unchanged.
 
-This adds 32 to %rdi, making it 42.
+
+EXAMPLES
+
+  addq $10, %rax     # rax = rax + 10
+  addq %rbx, %rax    # rax = rax + rbx
+  addq $1, %rdi      # rdi = rdi + 1 (increment)
+
+
+FLAGS
+
+Addition also sets CPU flags:
+  - ZF (Zero Flag) = 1 if result is zero
+  - SF (Sign Flag) = 1 if result is negative
+  - CF (Carry Flag) = 1 if unsigned overflow
+  - OF (Overflow Flag) = 1 if signed overflow
+
+We'll use these later for conditional jumps.
+
+
+THE PROBLEM
+
+You have 10 in %rdi.
+You need 42 in %rdi.
+
+The difference is: 42 - 10 = ???
+
+You need to add that difference.
+
+
+YOUR TASK
+
+Write an addq instruction that adds the right value to %rdi.
+
+The general form is:
+  addq $VALUE, %REGISTER
+
+What should VALUE be to turn 10 into 42?

@@ -1,19 +1,59 @@
-Exercise 13: Loading from Memory
+════════════════════════════════════════
+LESSON 13: Bit Shifting
+════════════════════════════════════════
 
-Data can be stored in the .data section and loaded at runtime.
+SHIFT OPERATIONS
 
-LOADING SYNTAX:
-  movq label(%rip), %rax
+Shifting moves all bits left or right by N positions.
 
-The (%rip) makes it "position-independent" - the address is
-calculated relative to the current instruction pointer.
-This is important for modern executable security features.
 
-THE PROBLEM:
-Load the value at 'secret' into %rdi.
+LEFT SHIFT (SHL)
 
-TO COMPLETE:
-Add this instruction:
-  movq secret(%rip), %rdi
+  shlq $N, DEST   →   DEST = DEST << N
 
-This loads the 64-bit value at address 'secret' into %rdi.
+Shifts bits LEFT, filling with zeros on the right.
+Each position left = multiply by 2.
+
+  shlq $1, %rax     # rax * 2
+  shlq $2, %rax     # rax * 4
+  shlq $3, %rax     # rax * 8
+
+Example: 5 << 3 = 5 * 8 = 40
+  00000101 << 3 = 00101000
+
+
+RIGHT SHIFT (SHR)
+
+  shrq $N, DEST   →   DEST = DEST >> N
+
+Shifts bits RIGHT, filling with zeros on the left.
+Each position right = divide by 2 (unsigned).
+
+  shrq $1, %rax     # rax / 2
+  shrq $2, %rax     # rax / 4
+
+
+WHY SHIFTING?
+
+Shifting is MUCH faster than multiplication/division!
+Compilers often convert "x * 8" to "x << 3".
+
+
+THE MATH
+
+  Left shift by N  = multiply by 2^N
+  Right shift by N = divide by 2^N (unsigned)
+
+  2^1 = 2
+  2^2 = 4
+  2^3 = 8
+  2^4 = 16
+
+
+YOUR TASK
+
+Calculate 5 * 8 using a left shift.
+
+8 = 2^3, so shifting left by 3 multiplies by 8.
+
+  shlq $???, %rdi

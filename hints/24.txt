@@ -1,25 +1,57 @@
-Exercise 24: Function Arguments
+════════════════════════════════════════
+LESSON 24: Array Access with Indexed Addressing
+════════════════════════════════════════
 
-System V AMD64 calling convention:
-  1st argument: %rdi
-  2nd argument: %rsi
-  3rd argument: %rdx
-  4th argument: %rcx
-  5th argument: %r8
-  6th argument: %r9
-  7th+: on the stack
+ARRAYS IN MEMORY
 
-Return value goes in %rax.
+An array is just contiguous memory locations.
+For 64-bit integers, each element is 8 bytes apart.
 
-THE PROBLEM:
-1. Set up arguments for add(25, 19)
-2. The add function should return the sum
+  numbers: .quad 10, 20, 15, 5
 
-TO COMPLETE:
-Before the call, set up args:
-  movq $25, %rdi
-  movq $19, %rsi
+  Address:     numbers+0   numbers+8   numbers+16  numbers+24
+  Index:          [0]         [1]         [2]         [3]
+  Value:          10          20          15           5
 
-In the add function body:
-  movq %rdi, %rax    # rax = first arg
-  addq %rsi, %rax    # rax = rax + second arg
+
+INDEXED ADDRESSING
+
+  (base, index, scale)
+
+Computes: base + (index * scale)
+
+For array of 64-bit integers (8 bytes each):
+  (%rsi, %r8, 8)   = rsi + r8*8 = address of element r8
+
+
+LOADING AN ELEMENT
+
+  movq (%rsi, %r8, 8), %rax
+
+Loads the value at address (rsi + r8*8) into rax.
+
+If rsi = base of array and r8 = index:
+  This loads array[index] into rax.
+
+
+THE ALGORITHM
+
+  sum = 0
+  for i = 0 to count-1:
+      sum += numbers[i]
+
+In assembly:
+  - %rdi = sum
+  - %r8 = index i
+  - %rcx = counter (counts down)
+  - %rsi = base address
+
+
+YOUR TASK
+
+Fill in the loop body:
+  1. Load numbers[r8] into %rax
+  2. Add %rax to %rdi (the sum)
+  3. Increment %r8 (next index)
+  4. Decrement %rcx (counter)
+  5. Loop if not zero

@@ -1,21 +1,56 @@
-Exercise 19: Saving Registers
+════════════════════════════════════════
+LESSON 19: Reverse Engineering - Reading Code
+════════════════════════════════════════
 
-The stack is perfect for temporarily saving registers.
+THE SKILL
 
-PATTERN:
-  pushq %rbx      # save
-  # ... use rbx for something ...
-  popq %rbx       # restore
+In the real world, you often need to understand code you didn't write.
+This might be:
+  - Someone else's code
+  - Compiler output
+  - Malware (for security research)
+  - Legacy systems
 
-THE PROBLEM:
-We have 55 in %rdi. We need to save it, let it get clobbered,
-then restore it.
+This exercise builds that skill.
 
-TO COMPLETE:
-Add pushq before the clobber and popq after:
 
-  pushq %rdi      # save rdi
-  movq $999, %rdi # clobber rdi
-  popq %rdi       # restore rdi
+THE CODE
 
-After popq, %rdi is back to 55.
+  movq value(%rip), %rax    # Load value (0x0A0B) into rax
+  shrq $8, %rax             # Shift right by 8 bits
+  movq %rax, %rdi           # Move to rdi for exit
+
+
+ANALYZING SHRQ
+
+shrq $8, %rax shifts all bits RIGHT by 8 positions.
+
+In hexadecimal, each digit is 4 bits.
+Shifting right by 8 bits = shifting right by 2 hex digits.
+
+  0x0A0B → shift right 8 → 0x000A
+
+The low byte (0x0B) gets shifted out and lost.
+The high byte (0x0A) moves to the low position.
+
+
+THE MATH
+
+  0x0A0B in binary:  0000 1010 0000 1011
+
+  After shrq $8:     0000 0000 0000 1010
+
+  Result: 0x0A = 10 decimal
+
+
+WHAT THIS CODE DOES
+
+It extracts the HIGH byte of a 16-bit value.
+This is a common pattern: shift right to move high bits to low position.
+
+
+YOUR TASK
+
+The value is 0x0A0B. After shrq $8, what's the result in decimal?
+
+0x0A = ??? in decimal

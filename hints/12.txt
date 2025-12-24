@@ -1,25 +1,50 @@
-Exercise 12: Bit Shifting
+════════════════════════════════════════
+LESSON 12: Bitwise XOR - The Magic Instruction
+════════════════════════════════════════
 
-Shifting moves bits left or right.
+XOR OPERATION
 
-LEFT SHIFT (shl):
-Each position = multiply by 2.
-  shlq $1, %rax    # rax * 2
-  shlq $3, %rax    # rax * 8 (2^3 = 8)
+  xorq SOURCE, DEST   →   DEST = DEST ^ SOURCE
 
-RIGHT SHIFT (shr):
-Each position = divide by 2 (unsigned).
-  shrq $1, %rax    # rax / 2
-  shrq $3, %rax    # rax / 8
+XOR (eXclusive OR) produces 1 if bits are DIFFERENT:
 
-Shifting is MUCH faster than multiplication/division!
+  1 XOR 1 = 0
+  1 XOR 0 = 1
+  0 XOR 1 = 1
+  0 XOR 0 = 0
 
-THE PROBLEM:
-Calculate 5 * 8 using a shift.
-8 = 2^3, so we shift left by 3.
 
-TO COMPLETE:
-Add this instruction:
-  shlq $3, %rdi
+THE MAGIC PROPERTY
 
-This computes rdi = 5 << 3 = 5 * 8 = 40.
+  X XOR X = 0
+
+Anything XOR'd with itself is zero!
+
+  xorq %rax, %rax     # RAX = 0
+
+This is the fastest, most efficient way to zero a register.
+
+
+WHY NOT MOV?
+
+  movq $0, %rax       # 7 bytes, needs immediate value
+  xorq %rax, %rax     # 3 bytes, CPU recognizes this pattern
+
+The CPU has special optimizations for "xor reg, reg" - it knows you're
+zeroing the register and doesn't even need to wait for the old value.
+
+
+OTHER XOR TRICKS
+
+  - Swap without temp: a ^= b; b ^= a; a ^= b;
+  - Toggle specific bits: value ^= mask
+  - Simple encryption: data ^= key (XOR again to decrypt)
+
+
+YOUR TASK
+
+Zero out %rdi using XOR.
+
+  xorq OPERAND1, OPERAND2
+
+What should both operands be?
