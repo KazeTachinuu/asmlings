@@ -1,0 +1,26 @@
+Exercise 04: Registers
+
+Registers are tiny, fast storage slots inside the CPU.
+x86-64 has 16 general-purpose 64-bit registers:
+
+  %rax - Accumulator, return values, syscall number
+  %rbx - Base, callee-saved
+  %rcx - Counter, 4th argument
+  %rdx - Data, 3rd argument
+  %rsi - Source Index, 2nd argument
+  %rdi - Destination Index, 1st argument
+  %rbp - Base Pointer
+  %rsp - Stack Pointer
+  %r8-%r15 - Extra registers
+
+FOR SYSCALLS:
+  - Syscall number goes in %rax
+  - Arguments go in: %rdi, %rsi, %rdx, %r10, %r8, %r9
+
+THE PROBLEM:
+The code puts 99 in %rsi (the SECOND argument register).
+But the exit syscall wants the exit code in %rdi (FIRST argument).
+
+TO COMPLETE:
+Change %rsi to %rdi:
+  movq $99, %rdi

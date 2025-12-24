@@ -1,0 +1,25 @@
+Exercise 12: Bit Shifting
+
+Shifting moves bits left or right.
+
+LEFT SHIFT (shl):
+Each position = multiply by 2.
+  shlq $1, %rax    # rax * 2
+  shlq $3, %rax    # rax * 8 (2^3 = 8)
+
+RIGHT SHIFT (shr):
+Each position = divide by 2 (unsigned).
+  shrq $1, %rax    # rax / 2
+  shrq $3, %rax    # rax / 8
+
+Shifting is MUCH faster than multiplication/division!
+
+THE PROBLEM:
+Calculate 5 * 8 using a shift.
+8 = 2^3, so we shift left by 3.
+
+TO COMPLETE:
+Add this instruction:
+  shlq $3, %rdi
+
+This computes rdi = 5 << 3 = 5 * 8 = 40.

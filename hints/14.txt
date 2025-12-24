@@ -1,0 +1,15 @@
+Exercise 14: Storing to Memory
+
+To store a value to memory:
+  movq %rax, label(%rip)
+
+THE PROBLEM:
+1. Store the value 77 (in %rax) into 'result'
+2. Load it back into %rdi
+
+TO COMPLETE:
+Add these two instructions:
+  movq %rax, result(%rip)    # store rax to result
+  movq result(%rip), %rdi    # load result into rdi
+
+First we store, then we load it back. The exit code will be 77.

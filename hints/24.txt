@@ -1,0 +1,25 @@
+Exercise 24: Function Arguments
+
+System V AMD64 calling convention:
+  1st argument: %rdi
+  2nd argument: %rsi
+  3rd argument: %rdx
+  4th argument: %rcx
+  5th argument: %r8
+  6th argument: %r9
+  7th+: on the stack
+
+Return value goes in %rax.
+
+THE PROBLEM:
+1. Set up arguments for add(25, 19)
+2. The add function should return the sum
+
+TO COMPLETE:
+Before the call, set up args:
+  movq $25, %rdi
+  movq $19, %rsi
+
+In the add function body:
+  movq %rdi, %rax    # rax = first arg
+  addq %rsi, %rax    # rax = rax + second arg

@@ -1,0 +1,23 @@
+Exercise 11: Bitwise XOR
+
+XOR (exclusive or) returns 1 if bits are DIFFERENT.
+
+  1 XOR 1 = 0
+  1 XOR 0 = 1
+  0 XOR 1 = 1
+  0 XOR 0 = 0
+
+MAGIC PROPERTY:
+X XOR X = 0 (anything XOR itself is 0!)
+
+This means xorq %rax, %rax sets %rax to 0.
+It's the fastest way to zero a register.
+
+THE PROBLEM:
+Zero %rdi using XOR.
+
+TO COMPLETE:
+Add this instruction:
+  xorq %rdi, %rdi
+
+This computes rdi = rdi XOR rdi = 0.

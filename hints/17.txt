@@ -1,0 +1,25 @@
+Exercise 17: Loops
+
+A loop is just a conditional jump back to an earlier label.
+
+COMMON PATTERN:
+  movq $5, %rcx        # counter
+loop_start:
+  # ... do something ...
+  decq %rcx            # counter-- (sets ZF if zero)
+  jnz loop_start       # jump if not zero
+
+decq decrements a register and sets the Zero Flag if it becomes 0.
+jnz = "jump if not zero" (ZF=0).
+
+THE PROBLEM:
+We need to loop 5 times, adding 1 each time.
+The loop body already has addq $1, %rdi.
+We need to decrement the counter and loop.
+
+TO COMPLETE:
+Add these two instructions after addq $1, %rdi:
+  decq %rcx
+  jnz loop_start
+
+Then the syscall code is reached after the loop ends.

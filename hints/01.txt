@@ -1,0 +1,35 @@
+Exercise 01: Your First Program
+
+This exercise is already complete! You just need to understand it and
+delete the "# I AM NOT DONE" line.
+
+WHAT'S HAPPENING:
+
+1. .global _start
+   This tells the linker where the program begins.
+   Every program needs an entry point.
+
+2. .text
+   This declares the code section. Executable instructions go here.
+
+3. _start:
+   This label marks where execution begins.
+
+4. movq $60, %rax
+   Put the number 60 into register %rax.
+   60 is the "exit" syscall number on Linux.
+   The $ means "literal value" (immediate).
+   The % means "register name".
+
+5. movq $0, %rdi
+   Put 0 into register %rdi.
+   This is the exit code (0 = success).
+   %rdi holds the first argument for syscalls.
+
+6. syscall
+   Ask the kernel to execute syscall #60 (exit).
+   The kernel reads %rax for the syscall number
+   and %rdi for the first argument.
+
+TO COMPLETE:
+Just delete the line "# I AM NOT DONE" and save the file.

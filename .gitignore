@@ -1,0 +1,28 @@
+# Build artifacts
+asmlings
+asmlings.o
+*.o
+
+# Test binaries
+tests/test_asmlings
+
+# Temp files
+/tmp/
+*.tmp
+
+# Editor files
+*~
+*.swp
+*.swo
+.*.swp
+\#*\#
+.#*
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db

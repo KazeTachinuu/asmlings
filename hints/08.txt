@@ -1,0 +1,27 @@
+Exercise 08: Division
+
+Division is the most complex arithmetic operation in x86.
+idiv divides a 128-bit number (in rdx:rax) by the operand.
+
+SETUP:
+  - %rdx = high 64 bits of dividend (clear this for simple division)
+  - %rax = low 64 bits of dividend
+  - Divisor in any register
+
+AFTER idivq %rcx:
+  - %rax = quotient
+  - %rdx = remainder
+
+IMPORTANT: Clear %rdx first for simple positive division!
+
+THE PROBLEM:
+Calculate 99 / 3 = 33
+
+TO COMPLETE:
+Add these instructions:
+  xorq %rdx, %rdx   # clear rdx (or: movq $0, %rdx)
+  movq $99, %rax    # dividend
+  movq $3, %rcx     # divisor
+  idivq %rcx        # divide
+
+The quotient (33) ends up in %rax, which gets moved to %rdi.

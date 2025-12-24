@@ -1,0 +1,21 @@
+Exercise 18: Push and Pop
+
+The stack is a LIFO (Last-In-First-Out) data structure.
+It grows DOWNWARD in memory.
+
+  pushq %rax    # push rax onto stack (rsp -= 8)
+  popq %rax     # pop top into rax (rsp += 8)
+
+%rsp (stack pointer) always points to the top of the stack.
+
+THE PROBLEM:
+We push 42, then push 99.
+Stack: [42, 99] <- 99 is on top
+First pop gets 99, second pop gets 42.
+
+TO COMPLETE:
+Add these instructions:
+  popq %rax     # get 99 (we don't need it)
+  popq %rdi     # get 42 (this is what we want)
+
+Or you could pop into any register for the first one.

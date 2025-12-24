@@ -1,0 +1,21 @@
+Exercise 19: Saving Registers
+
+The stack is perfect for temporarily saving registers.
+
+PATTERN:
+  pushq %rbx      # save
+  # ... use rbx for something ...
+  popq %rbx       # restore
+
+THE PROBLEM:
+We have 55 in %rdi. We need to save it, let it get clobbered,
+then restore it.
+
+TO COMPLETE:
+Add pushq before the clobber and popq after:
+
+  pushq %rdi      # save rdi
+  movq $999, %rdi # clobber rdi
+  popq %rdi       # restore rdi
+
+After popq, %rdi is back to 55.

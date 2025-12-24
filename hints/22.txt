@@ -1,0 +1,25 @@
+Exercise 22: Stack Alignment
+
+The System V AMD64 ABI requires the stack to be 16-byte aligned
+before a 'call' instruction.
+
+WHY IT MATTERS:
+- SSE instructions require 16-byte alignment
+- C library functions expect it
+- Crashes can happen without it
+
+HOW IT WORKS:
+At function entry, after 'call' pushed the return address (8 bytes),
+%rsp is 8 mod 16. After pushq %rbp (another 8 bytes), it's aligned!
+
+For local variables, always allocate in multiples of 16.
+
+THE PROBLEM:
+We need 16 bytes for locals. The function has the prologue but
+is missing the stack allocation.
+
+TO COMPLETE:
+Add this after movq %rsp, %rbp:
+  subq $16, %rsp
+
+This allocates 16 bytes, keeping the stack aligned.

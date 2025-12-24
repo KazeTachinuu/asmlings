@@ -1,0 +1,20 @@
+Exercise 07: Multiplication
+
+imul multiplies signed integers.
+
+TWO-OPERAND FORM:
+  imulq %rbx, %rax    # rax = rax * rbx
+
+THREE-OPERAND FORM:
+  imulq $5, %rbx, %rax    # rax = rbx * 5
+
+THE PROBLEM:
+We have 7 in %rdi and 8 in %rsi.
+We need to multiply them: 7 * 8 = 56
+The result must end up in %rdi.
+
+TO COMPLETE:
+Add this instruction:
+  imulq %rsi, %rdi
+
+This computes rdi = rdi * rsi = 7 * 8 = 56.

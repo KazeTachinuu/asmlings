@@ -1,0 +1,26 @@
+Exercise 10: Bitwise OR
+
+OR compares bits pair by pair.
+Result is 1 if EITHER (or both) bits is 1.
+
+  1 OR 1 = 1
+  1 OR 0 = 1
+  0 OR 1 = 1
+  0 OR 0 = 0
+
+COMBINING VALUES:
+OR is used to set bits or combine flags.
+
+EXAMPLE:
+  0x30 = 0011 0000
+  0x05 = 0000 0101
+  OR   = 0011 0101 = 0x35 = 53
+
+THE PROBLEM:
+Combine 0x30 and 0x05 to get 53.
+
+TO COMPLETE:
+Add this instruction:
+  orq %rsi, %rdi
+
+This ORs rsi into rdi: rdi = rdi | rsi = 0x30 | 0x05 = 0x35

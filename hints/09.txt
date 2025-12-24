@@ -1,0 +1,25 @@
+Exercise 09: Bitwise AND
+
+AND compares bits pair by pair.
+Result is 1 only if BOTH bits are 1.
+
+  1 AND 1 = 1
+  1 AND 0 = 0
+  0 AND 1 = 0
+  0 AND 0 = 0
+
+MASKING:
+AND is used to "mask" bits - keeping only certain bits.
+0xFF = 11111111 in binary = keeps lowest 8 bits.
+
+EXAMPLE:
+  0x1234 = 0001 0010 0011 0100
+  0x00FF = 0000 0000 1111 1111
+  Result = 0000 0000 0011 0100 = 0x34 = 52
+
+THE PROBLEM:
+Extract the low byte from 0x1234 to get 52.
+
+TO COMPLETE:
+Add this instruction:
+  andq $0xFF, %rdi

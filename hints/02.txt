@@ -1,0 +1,23 @@
+Exercise 02: Exit Codes
+
+Exit codes tell the system whether a program succeeded or failed.
+By convention: 0 = success, anything else = some kind of error.
+
+THE SYNTAX:
+  movq $0, %rdi
+
+  - movq: move quad (64 bits)
+  - $0: the literal value 0 ($ = immediate)
+  - %rdi: the destination register (% = register)
+
+TO COMPLETE:
+Change $0 to $42 in the line:
+  movq $0, %rdi
+
+The result should be:
+  movq $42, %rdi
+
+WHY IT WORKS:
+The exit syscall reads the exit code from %rdi.
+Whatever value is in %rdi when you call syscall
+becomes the program's exit code.

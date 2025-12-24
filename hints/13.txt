@@ -1,0 +1,19 @@
+Exercise 13: Loading from Memory
+
+Data can be stored in the .data section and loaded at runtime.
+
+LOADING SYNTAX:
+  movq label(%rip), %rax
+
+The (%rip) makes it "position-independent" - the address is
+calculated relative to the current instruction pointer.
+This is important for modern executable security features.
+
+THE PROBLEM:
+Load the value at 'secret' into %rdi.
+
+TO COMPLETE:
+Add this instruction:
+  movq secret(%rip), %rdi
+
+This loads the 64-bit value at address 'secret' into %rdi.

@@ -1,0 +1,23 @@
+Exercise 20: Call and Return
+
+call and ret implement function calls:
+
+  call label    # push return address, jump to label
+  ret           # pop return address, jump to it
+
+When you 'call', the address of the NEXT instruction is pushed.
+When the function does 'ret', it pops that address and jumps back.
+
+THE PROBLEM:
+We need to write a function called set_value that:
+1. Puts 66 into %rdi
+2. Returns
+
+TO COMPLETE:
+Add the function at the end of the file:
+
+set_value:
+    movq $66, %rdi
+    ret
+
+That's it! The function sets %rdi to 66 and returns.

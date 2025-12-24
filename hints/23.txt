@@ -1,0 +1,21 @@
+Exercise 23: Local Variables
+
+Local variables live on the stack, addressed relative to %rbp:
+  -8(%rbp)   = first local (8 bytes)
+  -16(%rbp)  = second local (8 bytes)
+  etc.
+
+The subq $16, %rsp allocates space for them.
+
+THE PROBLEM:
+Store 10 at -8(%rbp), 20 at -16(%rbp), add them to %rdi.
+
+TO COMPLETE:
+Add these instructions in the function body:
+
+  movq $10, -8(%rbp)      # store 10
+  movq $20, -16(%rbp)     # store 20
+  movq -8(%rbp), %rdi     # load first
+  addq -16(%rbp), %rdi    # add second
+
+Result: %rdi = 10 + 20 = 30

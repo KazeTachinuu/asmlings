@@ -1,0 +1,22 @@
+Exercise 25: Callee-Save Registers
+
+Some registers MUST be preserved by called functions:
+
+CALLEE-SAVE (you must save/restore if you use them):
+  %rbx, %rbp, %r12, %r13, %r14, %r15
+
+CALLER-SAVE (caller must save if it needs them after call):
+  %rax, %rcx, %rdx, %rsi, %rdi, %r8, %r9, %r10, %r11
+
+THE PROBLEM:
+The caller has 73 in %rbx. Our function clobbers %rbx.
+We must save it before clobbering and restore it after.
+
+TO COMPLETE:
+Save %rbx at the start:
+  pushq %rbx
+
+Restore it before ret:
+  popq %rbx
+
+This preserves the caller's value as required.

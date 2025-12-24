@@ -1,0 +1,24 @@
+Exercise 15: Comparison
+
+cmpq compares two values by subtracting them and setting CPU flags.
+The result is thrown away - only the flags matter.
+
+  cmpq $50, %rdi    # computes rdi - 50, sets flags
+
+FLAGS:
+  ZF (Zero Flag): set if result = 0 (values are equal)
+  SF (Sign Flag): set if result < 0 (first < second)
+
+After cmp, use conditional jumps:
+  je  label   # jump if equal (ZF=1)
+  jne label   # jump if not equal (ZF=0)
+
+THE PROBLEM:
+The comparison checks if %rdi equals 50.
+Currently %rdi is 25, so je doesn't jump.
+
+TO COMPLETE:
+Change $25 to $50:
+  movq $50, %rdi
+
+Now cmpq $50, %rdi computes 50 - 50 = 0, setting ZF, and je jumps.

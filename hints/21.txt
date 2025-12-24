@@ -1,0 +1,26 @@
+Exercise 21: Stack Frames
+
+A stack frame is the region of stack used by a function.
+The standard prologue/epilogue:
+
+PROLOGUE (at function start):
+  pushq %rbp          # save old base pointer
+  movq %rsp, %rbp     # set new base pointer
+
+EPILOGUE (before return):
+  popq %rbp           # restore old base pointer
+  ret
+
+%rbp (base pointer) marks the bottom of our frame.
+This creates a stable reference point for local variables.
+
+THE PROBLEM:
+Complete the prologue and epilogue in my_func.
+
+TO COMPLETE:
+Add the prologue:
+  pushq %rbp
+  movq %rsp, %rbp
+
+And the epilogue (before ret):
+  popq %rbp

@@ -1,0 +1,18 @@
+Exercise 27: sys_read
+
+The read syscall (number 0) reads input:
+  %rax = 0 (syscall number)
+  %rdi = file descriptor (0 = stdin)
+  %rsi = pointer to buffer
+  %rdx = maximum bytes to read
+
+Returns: number of bytes actually read (in %rax)
+
+This exercise is already complete!
+The code correctly sets up sys_read and uses the return value
+(bytes read) as the exit code.
+
+TO COMPLETE:
+Just delete the "# I AM NOT DONE" line.
+
+The test will send "hello" (5 bytes), so exit code will be 5.

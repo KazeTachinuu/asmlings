@@ -1,0 +1,18 @@
+Exercise 05: Addition
+
+add performs addition: addq SOURCE, DESTINATION
+The result is stored in DESTINATION.
+
+EXAMPLES:
+  addq $10, %rax    # rax = rax + 10
+  addq %rbx, %rax   # rax = rax + rbx
+
+THE PROBLEM:
+We have 10 in %rdi and need 42.
+42 - 10 = 32, so we need to add 32.
+
+TO COMPLETE:
+Add this instruction:
+  addq $32, %rdi
+
+This adds 32 to %rdi, making it 42.

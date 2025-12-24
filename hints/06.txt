@@ -1,0 +1,18 @@
+Exercise 06: Subtraction
+
+sub performs subtraction: subq SOURCE, DESTINATION
+It computes DESTINATION = DESTINATION - SOURCE
+
+CAREFUL WITH THE ORDER:
+  subq $10, %rax   means   rax = rax - 10
+  NOT                      rax = 10 - rax
+
+The source is what gets SUBTRACTED FROM the destination.
+
+THE PROBLEM:
+We have 100 in %rdi and need 77.
+100 - 23 = 77, so we need to subtract 23.
+
+TO COMPLETE:
+Add this instruction:
+  subq $23, %rdi

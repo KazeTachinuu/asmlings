@@ -1,0 +1,31 @@
+Exercise 28: String Length
+
+C strings are null-terminated - they end with byte 0.
+To find the length, count characters until you hit 0.
+
+ALGORITHM:
+  length = 0
+  while *ptr != 0:
+    length++
+    ptr++
+
+INSTRUCTIONS NEEDED:
+  cmpb $0, (%rdi)    # compare byte at address rdi with 0
+  je strlen_done     # if zero, we're done
+  incq %rax          # length++
+  incq %rdi          # ptr++
+  jmp strlen_loop    # repeat
+
+Note: cmpb compares BYTES (8-bit), not quads.
+(%rdi) means "the value at address rdi" - memory access.
+
+TO COMPLETE:
+Add these instructions in strlen_loop:
+
+  cmpb $0, (%rdi)
+  je strlen_done
+  incq %rax
+  incq %rdi
+  jmp strlen_loop
+
+"Hello" has 5 characters, so exit code is 5.
