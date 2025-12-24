@@ -1,6 +1,6 @@
-# ============================================================================
+# ======================================
 # Exercise 33: Callee-Save Registers - The Contract
-# ============================================================================
+# ======================================
 #
 # CALLEE-SAVE registers: %rbx, %rbp, %r12-%r15
 # If your function uses these, you MUST save and restore them!
@@ -12,7 +12,7 @@
 #            Save it before clobbering, restore before returning.
 #
 # Expected exit code: 73
-# ============================================================================
+# ======================================
 
 # I AM NOT DONE
 

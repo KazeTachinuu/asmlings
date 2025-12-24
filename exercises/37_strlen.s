@@ -1,6 +1,6 @@
-# ============================================================================
+# ======================================
 # Exercise 37: Capstone - Implement strlen
-# ============================================================================
+# ======================================
 #
 # C strings are null-terminated (end with byte 0).
 # strlen counts characters until it finds the null terminator.
@@ -21,7 +21,7 @@
 # YOUR TASK: Complete the strlen function.
 #
 # Expected exit code: 5 (length of "Hello")
-# ============================================================================
+# ======================================
 
 # I AM NOT DONE
 
