@@ -16,6 +16,7 @@
 # Expected exit code: 56
 # ======================================
 
+# I AM NOT DONE
 
 .global _start
 .text
@@ -25,7 +26,6 @@ _start:
     movq $8, %rax
 
     # YOUR CODE HERE: multiply %rax by %rdi, result should be in %rdi
-    imulq %rax, %rdi
 
 
     movq $60, %rax

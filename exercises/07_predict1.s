@@ -12,9 +12,10 @@
 # Once you know the answer, the "expected exit code" below is WRONG.
 # Fix the expected value in this comment, then remove the marker.
 #
-# Expected exit code: 67 (YOU figure it out!)
+# Expected exit code: ??? (YOU figure it out!)
 # ======================================
 
+# I AM NOT DONE
 
 .global _start
 .text

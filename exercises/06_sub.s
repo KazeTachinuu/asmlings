@@ -13,6 +13,7 @@
 # Expected exit code: 77
 # ======================================
 
+# I AM NOT DONE
 
 .global _start
 .text
@@ -21,7 +22,6 @@ _start:
     movq $100, %rdi
 
     # YOUR CODE HERE: subtract from %rdi to get 77
-    sub $23, %rdi
 
 
     movq $60, %rax

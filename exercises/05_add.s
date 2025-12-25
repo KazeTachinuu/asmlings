@@ -15,6 +15,7 @@
 # Expected exit code: 42
 # ======================================
 
+# I AM NOT DONE
 
 .global _start
 .text
@@ -23,7 +24,6 @@ _start:
     movq $10, %rdi
 
     # YOUR CODE HERE: add to %rdi to make it 42
-    add $32, %rdi
 
 
     movq $60, %rax
