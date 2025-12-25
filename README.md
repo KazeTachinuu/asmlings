@@ -14,6 +14,7 @@ make                 # Build
 ./asmlings list      # Show all exercises
 ./asmlings hint      # Get hint for current exercise
 ./asmlings hint 05   # Get hint for exercise 05
+./asmlings run 05    # Run exercise 05 directly
 ```
 
 ## How It Works
@@ -40,13 +41,19 @@ echo $?                              # Check exit code
 - [Syscall Table](https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)
 - [x86-64 Registers](https://wiki.osdev.org/CPU_Registers_x86-64)
 
+## Development
+
+```bash
+make test            # Run test suite (requires bats)
+```
+
 ## AI Usage
 
 Claude Code (Opus 4.5) assisted with:
 - Dynamic exercise validation (parsing `Expected exit code:` and `Expected output:` from comments)
 - Stdout capture via pipes for output verification
 - Code cleanup and refactoring for modularity
-- Test suite (`tests/test_asmlings.c`)
+- Test suite (BATS)
 - Documentation
 
 The core watcher, exercises, and hints were written mostly manually and polished by Claude.

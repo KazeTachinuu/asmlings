@@ -247,6 +247,16 @@ load helpers
     assert_contains "$output" "Usage"
 }
 
+@test "run: shows error on compile failure" {
+    test_setup
+    exercise "01_bad.s" "invalid.s" 0 0
+
+    out=$(asmlings run 01)
+    assert_contains "$out" "failed"
+
+    test_cleanup
+}
+
 @test "run: executes and shows exit code" {
     test_setup
     exercise "01_test.s" "exit42.s" 0 42

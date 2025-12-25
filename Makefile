@@ -17,7 +17,7 @@ asmlings: $(SRCS)
 	@rm -f asmlings.o
 
 clean:
-	rm -f asmlings asmlings.o /tmp/asmlings_tmp* tests/test_asmlings
+	rm -f asmlings asmlings.o /tmp/asmlings_tmp* 
 
 test: asmlings check-deps
 	@bats tests/test.bats
