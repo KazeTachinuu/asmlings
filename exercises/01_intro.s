@@ -15,7 +15,6 @@
 # Expected exit code: 0
 # ======================================
 
-# I AM NOT DONE
 
 .global _start
 .text

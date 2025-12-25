@@ -91,8 +91,9 @@ check_exercise:
     test al, al
     jz .check_failed
 
-    # Run (captures stdout if r15 > 0)
+    # Run (captures stdout if r15 > 0, stdin redirected to /dev/null)
     mov rdi, r15
+    mov rsi, 1                      # flags: redirect stdin to /dev/null
     call run_exercise
     mov r13, rax                    # r13 = exit code
 
@@ -328,13 +329,16 @@ compile_exercise:
 
 # Run compiled exercise with optional stdout capture
 # rdi = expected output length (0 = don't capture, >0 = capture)
+# rsi = flags: bit 0 = redirect stdin to /dev/null (for non-interactive mode)
 # Returns: exit code in eax, actual output in actual_output buffer
 run_exercise:
     push r12
+    push r13
     push r15
     sub rsp, 24                     # pipe fds [rsp], status [rsp+8]
 
     mov r15, rdi                    # save expected length
+    mov r13, rsi                    # save flags
     mov qword ptr [rip + actual_out_len], 0
 
     # If we need to capture output, create a pipe
@@ -356,6 +360,33 @@ run_exercise:
     jnz .run_parent
 
     # ===== CHILD PROCESS =====
+
+    # Redirect stdin to /dev/null if flag is set (prevents blocking on read)
+    test r13, 1
+    jz .run_child_stdout
+
+    # Open /dev/null for reading
+    mov rax, SYS_OPEN
+    lea rdi, [rip + dev_null]
+    xor esi, esi                    # O_RDONLY
+    xor edx, edx
+    syscall
+    test rax, rax
+    js .run_child_stdout            # skip on error
+
+    # dup2(null_fd, stdin)
+    mov rdi, rax                    # null_fd
+    push rdi
+    xor esi, esi                    # fd 0 = stdin
+    mov rax, SYS_DUP2
+    syscall
+
+    # Close original /dev/null fd
+    pop rdi
+    mov rax, SYS_CLOSE
+    syscall
+
+.run_child_stdout:
     # If capturing, redirect stdout to pipe write end
     test r15, r15
     jz .run_child_exec
@@ -436,5 +467,6 @@ run_exercise:
 .run_done:
     add rsp, 24
     pop r15
+    pop r13
     pop r12
     ret

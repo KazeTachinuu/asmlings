@@ -475,6 +475,91 @@ cmd_hint:
     pop rbx
     ret
 
+# Run command - execute a specific exercise with stdin passthrough
+# rdi = argc, rsi = argv
+cmd_run:
+    push rbx
+    push r12
+    push r13
+    mov rbx, rdi                    # argc
+    mov r13, rsi                    # argv
+
+    # Check for exercise argument
+    cmp rbx, 3
+    jl .run_usage
+
+    call load_exercises
+
+    # Find exercise by number
+    mov rdi, [r13 + 16]             # argv[2]
+    call find_exercise_by_num
+    test rax, rax
+    jnz .run_found
+
+    # Try by filename
+    mov rdi, [r13 + 16]
+    call find_exercise_by_name
+    test rax, rax
+    jz .run_not_found
+
+.run_found:
+    mov r12, rax
+
+    # Print "Running <exercise>"
+    lea rdi, [rip + msg_running]
+    call print_str
+    lea rdi, [rip + style_bold]
+    call print_str
+    mov rdi, r12
+    call get_filename_ptr
+    mov rdi, rax
+    call print_str
+    lea rdi, [rip + color_reset]
+    call print_str
+    call print_newline
+
+    # Compile
+    mov rdi, r12
+    call compile_exercise
+    test al, al
+    jz .run_compile_failed
+
+    # Run with stdin passthrough (rsi=0 means don't redirect stdin)
+    xor edi, edi                    # no output capture
+    xor esi, esi                    # flags=0: keep stdin open
+    call run_exercise
+    mov r12, rax                    # save exit code
+
+    # Print exit code
+    lea rdi, [rip + msg_exit_code]
+    call print_str
+    mov rdi, r12
+    call print_number
+    call print_newline
+    jmp .run_exit
+
+.run_compile_failed:
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_failed]
+    call print_colored
+    jmp .run_exit
+
+.run_not_found:
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_not_found]
+    call print_colored
+    jmp .run_exit
+
+.run_usage:
+    lea rdi, [rip + msg_run_usage]
+    call print_str
+
+.run_exit:
+    pop r13
+    pop r12
+    pop rbx
+    ret
+
 # Help command
 cmd_help:
     push rbx
@@ -531,6 +616,7 @@ help_usage:     .asciz "    ./asmlings [COMMAND]\n\n"
 help_cmds_hdr:  .asciz "COMMANDS:\n"
 help_cmds:
     .ascii "    watch      Watch for changes and check exercises (default)\n"
+    .ascii "    run N      Run exercise N with stdin passthrough (e.g. run 35)\n"
     .ascii "    list       Show all exercises with status\n"
     .ascii "    hint [N]   Show hint for current or exercise N (e.g. hint 05)\n"
     .ascii "    help       Show this help message\n\n"

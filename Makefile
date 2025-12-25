@@ -1,4 +1,4 @@
-.PHONY: all clean test
+.PHONY: all clean test check-deps
 
 SRCS = asmlings.s \
        src/constants.s \
@@ -19,9 +19,9 @@ asmlings: $(SRCS)
 clean:
 	rm -f asmlings asmlings.o /tmp/asmlings_tmp* tests/test_asmlings
 
-test: asmlings tests/test_asmlings
-	@./tests/test_asmlings
+test: asmlings check-deps
+	@bats tests/test.bats
 
-tests/test_asmlings: tests/test_asmlings.c
-	@mkdir -p tests
-	gcc -o tests/test_asmlings tests/test_asmlings.c -Wall -Wextra
+check-deps:
+	@command -v bats >/dev/null || { echo "Error: bats not found. Install with: pacman -S bats"; exit 1; }
+	@command -v timeout >/dev/null || { echo "Error: timeout not found (coreutils)"; exit 1; }

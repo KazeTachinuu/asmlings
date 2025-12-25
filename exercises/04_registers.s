@@ -17,12 +17,11 @@
 # Expected exit code: 99
 # ======================================
 
-# I AM NOT DONE
 
 .global _start
 .text
 
 _start:
     movq $60, %rax
-    movq $99, %rsi          # BUG: wrong register!
+    movq $99, %rdi          # BUG: wrong register!
     syscall

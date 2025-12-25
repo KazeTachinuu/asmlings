@@ -14,7 +14,6 @@
 # Expected exit code: 25
 # ======================================
 
-# I AM NOT DONE
 
 .global _start
 .text
@@ -23,6 +22,7 @@ _start:
     movq $25, %rax
 
     # YOUR CODE HERE: copy %rax to %rdi
+    movq %rax, %rdi
 
 
     movq $60, %rax

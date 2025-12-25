@@ -15,12 +15,11 @@
 # Expected exit code: 42
 # ======================================
 
-# I AM NOT DONE
 
 .global _start
 .text
 
 _start:
     movq $60, %rax
-    movq $0, %rdi           # What should this value be?
+    movq $42, %rdi           # What should this value be?
     syscall

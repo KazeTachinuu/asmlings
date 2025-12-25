@@ -29,6 +29,12 @@ _start:
     test al, al
     jnz .do_hint
 
+    lea rdi, [rip + cmd_run_str]
+    mov rsi, r12
+    call str_equals
+    test al, al
+    jnz .do_run
+
     # Unknown command - show help
     jmp .do_help
 
@@ -44,6 +50,12 @@ _start:
     mov rdi, [rbp]          # argc
     lea rsi, [rbp + 8]      # argv
     call cmd_hint
+    jmp .exit_success
+
+.do_run:
+    mov rdi, [rbp]          # argc
+    lea rsi, [rbp + 8]      # argv
+    call cmd_run
     jmp .exit_success
 
 .do_help:

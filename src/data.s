@@ -4,12 +4,14 @@
 cmd_list_str:       .asciz "list"
 cmd_watch_str:      .asciz "watch"
 cmd_hint_str:       .asciz "hint"
+cmd_run_str:        .asciz "run"
 
 # Paths
 exercises_dir:      .asciz "exercises"
 tmp_obj:            .asciz "/tmp/asmlings_tmp.o"
 tmp_exe:            .asciz "/tmp/asmlings_tmp"
 hints_dir:          .asciz "hints/"
+dev_null:           .asciz "/dev/null"
 cmd_as:             .asciz "/usr/bin/as"
 cmd_ld:             .asciz "/usr/bin/ld"
 as_arg0:            .asciz "as"
@@ -76,6 +78,9 @@ msg_no_hint:        .asciz "No hint needed - all exercises complete!\n"
 msg_not_found:      .asciz "Exercise not found\n"
 msg_remove_marker:  .asciz "Remove '# I AM NOT DONE' when ready.\n"
 msg_hint_tip:       .asciz "Run './asmlings hint' for help.\n\n"
+msg_running:        .asciz "Running "
+msg_exit_code:      .asciz "Exit code: "
+msg_run_usage:      .asciz "Usage: ./asmlings run <exercise>\nExample: ./asmlings run 35\n"
 
 # Symbols
 symbol_check:       .asciz "✓"
