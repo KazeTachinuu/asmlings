@@ -21,7 +21,8 @@
 #   - Callee-save: %rbx, %rbp, %r12-%r15
 #   - Caller-save: everything else
 #
-# To test: echo "Hello, World!" | ./your_program
+# To test: echo "Hello, World!" | ./asmlings run 38
+# (Should print "Hello, World!" and exit 0)
 # Expected exit code: 0
 # ======================================
 

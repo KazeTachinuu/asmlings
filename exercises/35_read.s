@@ -19,7 +19,8 @@
 #   - Why is the return value useful?
 #
 # To test: echo "hello" | ./asmlings run 35
-# Expected exit code: 6 (5 chars + newline)
+# (That returns 6: 5 chars + newline)
+# Expected exit code: 0
 # ======================================
 
 # I AM NOT DONE
