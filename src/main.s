@@ -6,6 +6,13 @@ _start:
     mov rdi, [rsp]          # argc
     lea rsi, [rsp + 8]      # argv
 
+    # Save envp (after argv NULL terminator)
+    # envp = argv + (argc+1)*8
+    mov rax, rdi
+    inc rax
+    lea rax, [rsi + rax*8]
+    mov [rip + saved_envp], rax
+
     cmp rdi, 1
     jle .do_watch
 
@@ -35,6 +42,12 @@ _start:
     test al, al
     jnz .do_run
 
+    lea rdi, [rip + cmd_check_str]
+    mov rsi, r12
+    call str_equals
+    test al, al
+    jnz .do_check
+
     # Unknown command - show help
     jmp .do_help
 
@@ -56,6 +69,12 @@ _start:
     mov rdi, [rbp]          # argc
     lea rsi, [rbp + 8]      # argv
     call cmd_run
+    jmp .exit_success
+
+.do_check:
+    mov rdi, [rbp]          # argc
+    lea rsi, [rbp + 8]      # argv
+    call cmd_check
     jmp .exit_success
 
 .do_help:

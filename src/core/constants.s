@@ -8,12 +8,14 @@
 .equ SYS_EXECVE,            59
 .equ SYS_EXIT,              60
 .equ SYS_WAIT4,             61
-.equ SYS_GETDENTS64,        217
+.equ SYS_UNLINK,            87
 .equ SYS_INOTIFY_INIT,      253
 .equ SYS_INOTIFY_ADD_WATCH, 254
 
 # File flags
 .equ O_RDONLY,              0
+.equ O_WRONLY_CREAT_TRUNC,  0x241   # O_WRONLY | O_CREAT | O_TRUNC
+.equ FILE_PERM_RW,          0644    # rw-r--r--
 
 # inotify flags (CLOSE_WRITE | MOVED_TO | CREATE)
 .equ IN_WATCH_MASK,         0x00000188
@@ -22,13 +24,13 @@
 .equ MAX_EXERCISES,         64
 .equ MAX_PATH,              256
 .equ EXERCISE_SIZE,         264     # MAX_PATH + 8 (state + padding)
-.equ DIRENT_BUFFER_SIZE,    4096
 .equ INOTIFY_BUF_SIZE,      4096
 .equ PROGRESS_WIDTH,        20
 
 # Buffer sizes
 .equ SOURCE_BUFFER_SIZE,    65536
 .equ HINT_BUFFER_SIZE,      4096
+.equ EXPECTED_BUF_SIZE,     4096
 .equ OUTPUT_MAX_LEN,        255     # max output to capture (buffer is 256)
 
 # Exercise states

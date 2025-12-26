@@ -8,8 +8,7 @@ print_banner:
     call print_str
     lea rdi, [rip + banner]
     call print_str
-    lea rdi, [rip + color_reset]
-    call print_str
+    call print_reset
     pop rbx
     ret
 
@@ -22,8 +21,7 @@ print_colored:
     call print_str              # print color
     mov rdi, r12
     call print_str              # print message
-    lea rdi, [rip + color_reset]
-    call print_str              # print reset
+    call print_reset
     pop r12
     pop rbx
     ret
@@ -52,6 +50,10 @@ print_char:
 
 print_newline:
     lea rdi, [rip + msg_newline]
+    jmp print_str
+
+print_reset:
+    lea rdi, [rip + color_reset]
     jmp print_str
 
 # Print number in rdi (base 10)
@@ -120,8 +122,7 @@ print_progress_bar:
     jmp .ppb_filled
 
 .ppb_filled_done:
-    lea rdi, [rip + color_reset]
-    call print_str
+    call print_reset
 
     # Print empty (dim)
     lea rdi, [rip + style_dim]
@@ -138,8 +139,7 @@ print_progress_bar:
     jmp .ppb_empty
 
 .ppb_empty_done:
-    lea rdi, [rip + color_reset]
-    call print_str
+    call print_reset
 
 .ppb_counts:
     lea rdi, [rip + msg_bracket_close]

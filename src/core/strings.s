@@ -115,28 +115,6 @@ str_find:
     pop r12
     ret
 
-# str_compare: Compare strings lexicographically
-# Returns <0 if rdi<rsi, 0 if equal, >0 if rdi>rsi
-str_compare:
-.str_cmp_loop:
-    movzx eax, byte ptr [rdi]
-    movzx ecx, byte ptr [rsi]
-    sub eax, ecx
-    jnz .str_cmp_done
-    test cl, cl
-    jz .str_cmp_done
-    inc rdi
-    inc rsi
-    jmp .str_cmp_loop
-.str_cmp_done:
-    ret
-
-# memcpy: Copy rcx bytes from rsi to rdi
-memcpy:
-    mov rax, rdi
-    rep movsb
-    ret
-
 # memcmp: Compare rcx bytes at rdi with rsi
 # Returns: 0 if equal, non-zero if different
 memcmp:

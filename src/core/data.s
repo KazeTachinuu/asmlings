@@ -5,20 +5,17 @@ cmd_list_str:       .asciz "list"
 cmd_watch_str:      .asciz "watch"
 cmd_hint_str:       .asciz "hint"
 cmd_run_str:        .asciz "run"
+cmd_check_str:      .asciz "check"
 
 # Paths
 exercises_dir:      .asciz "exercises"
-tmp_obj:            .asciz "/tmp/asmlings_tmp.o"
 tmp_exe:            .asciz "/tmp/asmlings_tmp"
 hints_dir:          .asciz "hints/"
 dev_null:           .asciz "/dev/null"
-cmd_as:             .asciz "/usr/bin/as"
-cmd_ld:             .asciz "/usr/bin/ld"
-as_arg0:            .asciz "as"
-as_arg1:            .asciz "--64"
-as_arg2:            .asciz "-o"
-ld_arg0:            .asciz "ld"
-ld_arg2:            .asciz "-o"
+cmd_bash:           .asciz "/bin/bash"
+compile_script:     .asciz "scripts/compile.sh"
+list_script:        .asciz "scripts/list_exercises.sh"
+gcc_mode_str:       .asciz "gcc"
 
 # Markers we check for
 marker_not_done:    .asciz "I AM NOT DONE"
@@ -84,6 +81,7 @@ msg_hint_tip:       .asciz "Run './asmlings hint' for help.\n\n"
 msg_running:        .asciz "Running "
 msg_exit_code:      .asciz "Exit code: "
 msg_run_usage:      .asciz "Usage: ./asmlings run <exercise>\nExample: ./asmlings run 35\n"
+msg_check_usage:    .asciz "Usage: ./asmlings check <exercise>\nExample: ./asmlings check 05\n"
 
 # Symbols
 symbol_check:       .asciz "✓"
@@ -103,7 +101,6 @@ sleeptime:
 .section .bss
 
 .align 8
-dirent_buffer:      .skip DIRENT_BUFFER_SIZE
 source_buffer:      .skip SOURCE_BUFFER_SIZE
 hint_buffer:        .skip HINT_BUFFER_SIZE
 hint_path_buf:      .skip 16
@@ -145,3 +142,10 @@ test_file_len:      .skip 8
 test_cleanup_path:  .skip 256
 test_has_file:      .skip 1
 test_has_cleanup:   .skip 1
+
+# GCC mode (G directive for C interop)
+test_use_gcc:       .skip 1
+test_c_file:        .skip 256
+
+# Environment pointer (for gcc which needs PATH)
+saved_envp:         .skip 8

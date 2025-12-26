@@ -27,6 +27,8 @@ load_expected_file:
     mov byte ptr [rip + test_has_file], 0
     mov byte ptr [rip + test_has_cleanup], 0
     mov qword ptr [rip + test_file_len], 0
+    # Initialize gcc mode
+    mov byte ptr [rip + test_use_gcc], 0
 
     # Extract exercise number from path
     # Find the filename part (after last /)
@@ -69,7 +71,7 @@ load_expected_file:
     mov rax, SYS_READ
     mov rdi, r14
     lea rsi, [rip + expected_buffer]
-    mov rdx, 4095
+    mov rdx, EXPECTED_BUF_SIZE - 1
     syscall
     mov r15, rax                    # r15 = bytes read
 
@@ -113,6 +115,8 @@ load_expected_file:
     je .lef_parse_file
     cmp al, 'C'
     je .lef_parse_cleanup
+    cmp al, 'G'
+    je .lef_parse_gcc
     jmp .lef_next_line
 
 .lef_skip_newline:
@@ -333,6 +337,31 @@ load_expected_file:
     mov byte ptr [rdi], 0           # null terminate
     jmp .lef_next_line
 
+.lef_parse_gcc:
+    # Format: "G" or "G path/to/file.c"
+    mov byte ptr [rip + test_use_gcc], 1
+    lea rdi, [rip + test_c_file]
+    mov byte ptr [rdi], 0           # default empty
+    inc rbx                         # skip "G"
+    # Check if there's more content (space + path)
+    movzx eax, byte ptr [rbx]
+    cmp al, ' '
+    jne .lef_next_line              # just "G", no path
+    inc rbx                         # skip space
+.lef_copy_c_file:
+    movzx eax, byte ptr [rbx]
+    cmp al, 10
+    je .lef_c_file_done
+    cmp al, 0
+    je .lef_c_file_done
+    mov [rdi], al
+    inc rdi
+    inc rbx
+    jmp .lef_copy_c_file
+.lef_c_file_done:
+    mov byte ptr [rdi], 0           # null terminate
+    jmp .lef_next_line
+
 .lef_next_line:
     # Find next line
     movzx eax, byte ptr [rbx]
@@ -358,77 +387,5 @@ load_expected_file:
     pop r14
     pop r13
     pop r12
-    pop rbx
-    ret
-
-# Parse decimal number from string
-# rdi = pointer to string, updated to point past number
-# Returns: value in eax
-parse_decimal:
-    xor eax, eax                    # accumulator
-.pd_loop:
-    movzx ecx, byte ptr [rdi]
-    sub ecx, '0'
-    cmp ecx, 9
-    ja .pd_done
-    imul eax, eax, 10
-    add eax, ecx
-    inc rdi
-    jmp .pd_loop
-.pd_done:
-    ret
-
-# Get student prediction from exercise file
-# Parses "Prediction: N" or "Prediction: ???" from source_buffer
-# Returns: prediction value in eax, or 256 if "???" or not found
-get_student_prediction:
-    push rbx
-
-    # Search for "Prediction:" in source_buffer
-    lea rdi, [rip + source_buffer]
-    lea rsi, [rip + marker_prediction]
-    call str_find
-    test rax, rax
-    jz .gsp_not_found
-
-    # Found it - skip past the prefix (11 chars: "Prediction:")
-    add rax, 11
-    mov rbx, rax
-
-    # Skip whitespace
-.gsp_skip_ws:
-    movzx ecx, byte ptr [rbx]
-    cmp cl, ' '
-    je .gsp_next_ws
-    cmp cl, '\t'
-    je .gsp_next_ws
-    jmp .gsp_check_predict
-
-.gsp_next_ws:
-    inc rbx
-    jmp .gsp_skip_ws
-
-.gsp_check_predict:
-    # Check if it's "???"
-    cmp byte ptr [rbx], '?'
-    jne .gsp_parse_num
-    cmp byte ptr [rbx + 1], '?'
-    jne .gsp_parse_num
-    cmp byte ptr [rbx + 2], '?'
-    jne .gsp_parse_num
-    # It's "???" - return 256
-    mov eax, 256
-    jmp .gsp_done
-
-.gsp_parse_num:
-    # Parse decimal number
-    mov rdi, rbx
-    call parse_decimal
-    jmp .gsp_done
-
-.gsp_not_found:
-    mov eax, 256
-
-.gsp_done:
     pop rbx
     ret
