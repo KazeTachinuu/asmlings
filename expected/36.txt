@@ -1,3 +1,3 @@
-# hello: print "Hello" to stdout
+# C calls assembly function
+G c_helpers/c_call_asm.c
 X 0
-O Hello\n

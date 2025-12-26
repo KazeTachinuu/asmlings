@@ -1,3 +1,4 @@
-# read_count: exit with byte count
-I test
-X 4
+# ASM calls C library (no C helper needed)
+G
+X 0
+O Hello from ASM!\n
