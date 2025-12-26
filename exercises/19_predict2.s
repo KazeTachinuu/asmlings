@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 07: Predict the Exit Code
+# Exercise 19: Predict the Exit Code
 # ======================================
 #
 # Trace through the code mentally. What will the exit code be?
@@ -8,16 +8,16 @@
 # Expected exit code: ???
 # ======================================
 
-
 .global _start
-.text
 
+.section .data
+value: .quad 0x0A0B
+
+.section .text
 _start:
-    movq $50, %rdi
-    movq $30, %rax
-    addq %rax, %rdi         # rdi = ?
-    subq $15, %rdi          # rdi = ?
-    addq $2, %rdi           # rdi = ?
+    movq value(%rip), %rax  # rax = 0x0A0B
+    shrq $8, %rax           # shift right 8 bits...
+    movq %rax, %rdi
 
     movq $60, %rax
     syscall

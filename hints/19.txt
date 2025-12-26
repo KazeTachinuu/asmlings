@@ -1,5 +1,5 @@
 ════════════════════════════════════════
-LESSON 19: Reverse Engineering - Reading Code
+LESSON 19: Bit Shifting - Predict the Exit Code
 ════════════════════════════════════════
 
 THE SKILL
@@ -52,5 +52,4 @@ This is a common pattern: shift right to move high bits to low position.
 YOUR TASK
 
 The value is 0x0A0B. After shrq $8, what's the result in decimal?
-
-0x0A = ??? in decimal
+Replace ??? with your answer, then remove the marker.

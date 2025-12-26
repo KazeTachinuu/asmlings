@@ -34,9 +34,5 @@ Work through each step. What's the final value of %rdi?
 YOUR TASK
 
 1. Trace through the code on paper or in your head
-2. Predict the exit code
-3. The comment says "Expected exit code: ???"
-4. Remove the marker - the test will verify your prediction
-
-DON'T run it first! The point is to build your tracing skills.
-Verify AFTER you've made your prediction.
+2. Replace ??? with your predicted exit code
+3. Remove the marker to verify your prediction

@@ -61,7 +61,6 @@ Trace through the code carefully:
   1. What are rax and rbx at the start?
   2. Is rax >= rbx?
   3. Which path is taken?
-  4. What operation is performed?
-  5. What is the final value of rax when we exit?
+  4. What is the final value in rdi?
 
-Write your prediction, then verify.
+Replace ??? with your answer, then remove the marker.
