@@ -2,19 +2,32 @@
 
 Learn x86-64 assembly by fixing small programs. Inspired by [rustlings](https://github.com/rust-lang/rustlings).
 
+**42 exercises** covering:
+- Basics (registers, arithmetic, logic)
+- Memory operations (load, store, addressing)
+- Control flow (comparisons, jumps, loops)
+- Stack and functions (call/ret, stack frames, calling conventions)
+- System I/O (read, write, files, arguments)
+
 ## Prerequisites
 
-Linux with `gcc`, `as`, `ld` (pre-installed on most systems).
+Linux with `as` and `ld` (pre-installed on most systems).
 
-## Usage
+## Quick Start
 
 ```bash
-make                 # Build
+make                 # Build asmlings
 ./asmlings           # Start learning (watch mode)
-./asmlings list      # Show all exercises
+```
+
+## Commands
+
+```bash
+./asmlings           # Watch mode - auto-checks on save
+./asmlings list      # Show all exercises with progress
 ./asmlings hint      # Get hint for current exercise
 ./asmlings hint 05   # Get hint for exercise 05
-./asmlings run 05    # Run exercise 05 directly
+./asmlings run 35    # Run exercise with stdin passthrough
 ```
 
 ## How It Works
@@ -28,11 +41,11 @@ make                 # Build
 ## Compiling Assembly Manually
 
 ```bash
-gcc -nostdlib -o program program.s   # Compile
+as program.s -o program.o            # Assemble
+ld program.o -o program              # Link
 ./program                            # Run
 echo $?                              # Check exit code
 ```
-
 
 ## Resources
 
