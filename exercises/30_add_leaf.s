@@ -1,5 +1,5 @@
 # ======================================
-# Exercise: Leaf Functions - No Stack Frame Needed
+# Exercise 30: Leaf Functions
 # ======================================
 #
 # A "leaf function" is a function that doesn't call other functions.

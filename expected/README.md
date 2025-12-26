@@ -2,71 +2,92 @@
 
 Each exercise has a corresponding `XX.txt` file that defines validation rules.
 
-## Directive Codes
+## Directives
 
-| Code | Purpose | Format |
-|------|---------|--------|
-| `#` | Comment | `# comment text` |
-| `X` | Expected exit code | `X 42` |
-| `P` | Prediction answer | `P 67` |
-| `I` | Stdin input | `I Hello, World!` |
-| `O` | Expected stdout | `O Hello, World!` |
-| `A` | Command-line arg | `A argvalue` |
-| `F` | Create test file | `F filename:content` |
-| `C` | Cleanup file | `C filename` |
+| Code | Purpose | Format | Example |
+|------|---------|--------|---------|
+| `#` | Comment | `# text` | `# This is a comment` |
+| `X` | Exit code | `X <code>` | `X 42` |
+| `O` | Expected output | `O <text>` | `O Hello` |
+| `I` | Stdin input | `I <text>` | `I input data` |
+| `A` | Argument | `A <value>` | `A filename.txt` |
+| `P` | Prediction | `P <answer>` | `P 67` |
+| `F` | Create file | `F <path>:<content>` | `F test.txt:data` |
+| `C` | Cleanup file | `C <path>` | `C test.txt` |
+| `G` | GCC mode | `G [c_file]` | `G` or `G helper.c` |
 
 ## Escape Sequences
 
-For I, O, and F directives:
+For `O`, `I`, and `F` directives:
 - `\n` = newline
 - `\\` = literal backslash
 
 ## Examples
 
-### Simple exit code
+### Exit code only
 ```
 X 42
+```
+
+### Output matching
+```
+X 0
+O Hello, World!\n
+```
+
+### Input/output
+```
+X 0
+I Hello
+O Hello
+```
+
+### With arguments
+```
+X 0
+A arg1
+A arg2
+O arg1 arg2
 ```
 
 ### Prediction exercise
 ```
 P 67
 ```
+Student fills in `# Prediction: ???` in the exercise file.
 
-### Input/output (cat-like)
+### File creation and cleanup
 ```
 X 0
-I Hello, World!
-O Hello, World!
-```
-
-### With arguments
-```
-X 0
-A hello
-A world
-O hello world
-```
-
-### With test file
-```
-X 0
-F input.txt:file content here
+F input.txt:file content
 A input.txt
-O file content here
+O file content
 C input.txt
 ```
 
 ### Multiline content
 ```
 X 0
-F data.txt:Line1\nLine2\nLine3
 O Line1\nLine2\nLine3
+```
+
+### GCC mode (C library calls)
+```
+G
+X 0
+O Hello from puts
+```
+
+### GCC mode with C helper file
+```
+G c_helpers/helper.c
+X 0
 ```
 
 ## Notes
 
 - One directive per line
-- Order doesn't matter (except multiple A directives are passed in order)
+- Order doesn't matter (except multiple `A` directives are passed in order)
+- `X` defaults to 0 if omitted
 - Exercise files use `# I AM NOT DONE` marker for incomplete exercises
-- Prediction exercises use `# Prediction: ???` in the exercise file (student fills in the number)
+- Prediction exercises use `# Prediction: ???` (student replaces `???` with their answer)

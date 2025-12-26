@@ -1,5 +1,5 @@
 # ======================================
-# Exercise: Recursion - Why We Need Stack Frames
+# Exercise 31: Recursion
 # ======================================
 #
 # factorial(n):

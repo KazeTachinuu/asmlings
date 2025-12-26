@@ -2,7 +2,7 @@
 
 Learn x86-64 assembly by fixing small programs. Inspired by [rustlings](https://github.com/rust-lang/rustlings).
 
-**44 exercises** covering:
+**46 exercises** covering:
 - Basics (registers, arithmetic, logic)
 - Memory operations (load, store, addressing)
 - Control flow (comparisons, jumps, loops)
@@ -11,7 +11,7 @@ Learn x86-64 assembly by fixing small programs. Inspired by [rustlings](https://
 
 ## Prerequisites
 
-Linux with `as` and `ld` (pre-installed on most systems).
+Linux with `as`, `ld`, and optionally `gcc` (for C interop exercises).
 
 ## Quick Start
 
@@ -27,7 +27,9 @@ make                 # Build asmlings
 ./asmlings list      # Show all exercises with progress
 ./asmlings hint      # Get hint for current exercise
 ./asmlings hint 05   # Get hint for exercise 05
+./asmlings check 05  # Check specific exercise
 ./asmlings run 35    # Run exercise with stdin passthrough
+./asmlings help      # Show all commands
 ```
 
 ## How It Works
@@ -58,15 +60,16 @@ echo $?                              # Check exit code
 
 ```bash
 make test            # Run test suite (requires bats)
+make clean           # Clean build artifacts
 ```
 
 ## AI Usage
 
 Claude Code (Opus 4.5) assisted with:
-- Dynamic exercise validation (parsing `Expected exit code:` and `Expected output:` from comments)
-- Stdout capture via pipes for output verification
-- Code cleanup and refactoring for modularity
-- Test suite (BATS)
+- Dynamic exercise validation system
+- Stdout/stdin capture via pipes
+- Modular architecture refactoring
+- Test suite (56 BATS tests)
 - Documentation
 
 The core watcher, exercises, and hints were written mostly manually and polished by Claude.

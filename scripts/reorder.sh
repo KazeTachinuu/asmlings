@@ -1,6 +1,8 @@
 #!/bin/bash
 # Exercise reordering script for asmlings
 
+set -e
+
 EXERCISES_DIR="exercises"
 EXPECTED_DIR="expected"
 HINTS_DIR="hints"
@@ -8,7 +10,7 @@ TMP_DIR="/tmp/asmlings_reorder_$$"
 
 show() {
     echo "=== Current Exercise Order ==="
-    for f in $(ls -1 "$EXERCISES_DIR"/*.s 2>/dev/null | sort); do
+    for f in $(ls -1 "$EXERCISES_DIR"/*.s 2>/dev/null | sort -V); do
         num=$(basename "$f" | cut -d_ -f1)
         name=$(basename "$f" .s | cut -d_ -f2-)
         expected=""
@@ -17,13 +19,6 @@ show() {
     done
 }
 
-# Apply new order from a file
-# File format: one exercise name per line (without number), in desired order
-# Example:
-#   intro
-#   exit_code
-#   mov
-#   ...
 apply_order() {
     local orderfile="$1"
 
@@ -33,6 +28,9 @@ apply_order() {
     fi
 
     mkdir -p "$TMP_DIR"/{exercises,expected,hints}
+
+    # Backup README.md if it exists
+    [ -f "$EXPECTED_DIR/README.md" ] && cp "$EXPECTED_DIR/README.md" "$TMP_DIR/"
 
     local n=1
     while IFS= read -r name || [ -n "$name" ]; do
@@ -54,7 +52,7 @@ apply_order() {
         # Copy to temp with new number
         cp "$oldfile" "$TMP_DIR/exercises/${new}_${name}.s"
 
-        # Update exercise number in file header (e.g., "Exercise 30:" -> "Exercise 32:")
+        # Update exercise number in file header
         sed -i "s/^# Exercise [0-9]*:/# Exercise $new:/" "$TMP_DIR/exercises/${new}_${name}.s"
 
         [ -f "$EXPECTED_DIR/$old.txt" ] && cp "$EXPECTED_DIR/$old.txt" "$TMP_DIR/expected/$new.txt"
@@ -69,21 +67,20 @@ apply_order() {
     rm -f "$EXPECTED_DIR"/*.txt
     rm -f "$HINTS_DIR"/*.txt
 
-    cp "$TMP_DIR/exercises"/*.s "$EXERCISES_DIR/" 2>/dev/null
-    cp "$TMP_DIR/expected"/*.txt "$EXPECTED_DIR/" 2>/dev/null
-    cp "$TMP_DIR/hints"/*.txt "$HINTS_DIR/" 2>/dev/null
+    cp "$TMP_DIR/exercises"/*.s "$EXERCISES_DIR/" 2>/dev/null || true
+    cp "$TMP_DIR/expected"/*.txt "$EXPECTED_DIR/" 2>/dev/null || true
+    cp "$TMP_DIR/hints"/*.txt "$HINTS_DIR/" 2>/dev/null || true
 
-    # Keep README in expected
-    [ -f "/tmp/asmlings_backup/expected/README.md" ] && cp "/tmp/asmlings_backup/expected/README.md" "$EXPECTED_DIR/"
+    # Restore README.md
+    [ -f "$TMP_DIR/README.md" ] && cp "$TMP_DIR/README.md" "$EXPECTED_DIR/"
 
     rm -rf "$TMP_DIR"
     echo "Done! New order applied."
 }
 
-# Generate current order file
 generate_order() {
     local outfile="${1:-order.txt}"
-    for f in $(ls -1 "$EXERCISES_DIR"/*.s 2>/dev/null | sort); do
+    for f in $(ls -1 "$EXERCISES_DIR"/*.s 2>/dev/null | sort -V); do
         basename "$f" .s | cut -d_ -f2-
     done > "$outfile"
     echo "Generated order file: $outfile"
@@ -114,7 +111,7 @@ case "$1" in
         echo ""
         echo "To reorder:"
         echo "  1. $0 generate order.txt"
-        echo "  2. Edit order.txt (rearrange lines, add new exercise names)"
+        echo "  2. Edit order.txt (rearrange lines)"
         echo "  3. $0 apply order.txt"
         ;;
 esac
