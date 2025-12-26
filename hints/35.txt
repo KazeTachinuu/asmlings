@@ -1,47 +1,71 @@
 ════════════════════════════════════════
-read_count - Reading Input
+LESSON 35: Passing Addresses to Functions
 ════════════════════════════════════════
 
-THE READ SYSCALL
+WHY PASS ADDRESSES?
 
-  movq $0, %rax         # syscall number (read = 0)
-  movq $0, %rdi         # file descriptor (stdin = 0)
-  movq $???, %rsi       # pointer to buffer
-  movq $???, %rdx       # max bytes to read
-  syscall
+Some functions need to WRITE data back to the caller.
+They can't do this through return values alone.
 
-After syscall, %rax contains bytes actually read.
+Example: scanf("%d", &x) - writes the parsed number to &x
 
 
-THE .BSS SECTION
+THE PATTERN
 
-The buffer is in .bss - uninitialized data. This reserves
-memory at runtime without taking space in the executable.
-
-  .section .bss
-  buffer: .skip 256     # Reserve 256 bytes
-
-To get the address of buffer:
-
-  leaq buffer(%rip), %rsi
+  1. Allocate space on the stack
+  2. Get the address of that space
+  3. Pass the address to the function
+  4. Function writes to that address
+  5. Read the value back
 
 
-USING THE RETURN VALUE
+ALLOCATING STACK SPACE
 
-The exit syscall needs the exit code in %rdi.
-But read returns the byte count in %rax.
+  subq $8, %rsp       # Allocate 8 bytes
 
-The exercise already has:
-  movq %rax, %rdi       # Move byte count to exit code
-  movq $60, %rax        # syscall number for exit
+The stack grows DOWN, so we subtract to allocate.
 
-So you just need to implement the read syscall above.
+
+GETTING THE ADDRESS
+
+  leaq (%rsp), %rdi   # Load address of stack top into %rdi
+
+LEA (Load Effective Address) computes an address without
+dereferencing it.
+
+
+READING THE VALUE BACK
+
+  movq (%rsp), %rdi   # Read the value at that address
+
+
+CLEANING UP
+
+  addq $8, %rsp       # Deallocate the 8 bytes
+
+Always clean up what you allocate!
+
+
+COMPLETE EXAMPLE
+
+  subq $8, %rsp       # 1. Allocate space
+  leaq (%rsp), %rdi   # 2. Get address into first argument
+  call store_42       # 3. Function writes 42 to that address
+  movq (%rsp), %rdi   # 4. Read the value back
+  addq $8, %rsp       # 5. Clean up
+
+
+STACK ALIGNMENT
+
+On x86-64, the stack should be 16-byte aligned before a call.
+Since 'call' pushes 8 bytes, allocating 8 more keeps it aligned.
 
 
 YOUR TASK
 
-Set up the four values and call syscall:
-  - %rax = 0 (read)
-  - %rdi = 0 (stdin)
-  - %rsi = address of buffer
-  - %rdx = 256 (buffer size)
+  1. subq $8, %rsp        - Allocate space
+  2. leaq (%rsp), %rdi    - Pass address to store_42
+  3. call store_42        - Let it write
+  4. movq (%rsp), %rdi    - Read the stored value
+  5. addq $8, %rsp        - Clean up
+  6. Exit with that value

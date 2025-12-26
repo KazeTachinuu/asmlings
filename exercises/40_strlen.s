@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 38: Capstone - Implement strlen
+# Exercise 40: Capstone - Implement strlen
 # ======================================
 #
 # C strings are null-terminated (end with byte 0).

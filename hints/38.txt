@@ -1,51 +1,43 @@
 ════════════════════════════════════════
-strlen - String Length
+echo - Combining Read and Write
 ════════════════════════════════════════
 
-C STRINGS
+THE CHALLENGE
 
-Strings in C end with a null terminator (byte value 0).
+After read syscall:
+  %rax = byte count
 
-  "Hello" in memory: 'H' 'e' 'l' 'l' 'o' '\0'
-                      72  101 108 108 111  0
+For write syscall, you need:
+  %rax = 1 (syscall number)
+  %rdx = byte count
 
-The null terminator marks the end.
-
-
-THE ALGORITHM
-
-  length = 0
-  while (*ptr != 0):      # While byte at pointer is not null
-      length++            # Increment counter
-      ptr++               # Move to next byte
-  return length
+The problem: read's return value is in %rax, but you need
+to put 1 in %rax for the write syscall!
 
 
-BYTE COMPARISON
+THE SOLUTION
 
-  cmpb $0, (%rdi)
+Save the byte count before you overwrite %rax:
 
-cmpb = compare BYTE (8-bit, not 64-bit!)
-(%rdi) = dereference: "the byte at address rdi"
+  # After read:
+  movq %rax, %r12       # Save byte count in r12
 
-
-THE LOOP
-
-  strlen_loop:
-      cmpb $0, (%rdi)     # Is current byte null?
-      je strlen_done      # If yes, we're done
-      incq %rax           # length++
-      incq %rdi           # ptr++
-      jmp strlen_loop     # Check next byte
-
-  strlen_done:
-      ret                 # Return length in %rax
+  # For write:
+  movq $1, %rax         # Now safe to set syscall number
+  movq %r12, %rdx       # Use saved byte count
 
 
-YOUR TASK
+THE COMPLETE FLOW
 
-Complete the loop body:
-  1. Compare byte at (%rdi) with 0
-  2. Jump to strlen_done if equal
-  3. Increment %rax and %rdi
-  4. Jump back to strlen_loop
+1. Read from stdin (fd=0) into buffer
+2. Save byte count from %rax to another register
+3. Set up write syscall (fd=1, buffer address, saved length)
+4. Call syscall
+5. Exit with 0
+
+
+REGISTER CHOICE
+
+Use any register that won't be overwritten. The callee-saved
+registers (%r12-%r15) are traditional choices for values you
+want to preserve across function calls.

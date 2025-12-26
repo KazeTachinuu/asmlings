@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 30: Setting Up a Stack Frame
+# Exercise 32: Setting Up a Stack Frame
 # ======================================
 #
 # A proper function needs a "stack frame" - a dedicated

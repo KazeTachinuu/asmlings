@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 39: Greet the User
+# Exercise 41: Greet the User
 # ======================================
 #
 # Print a greeting using the first command-line argument.

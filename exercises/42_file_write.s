@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 40: Write to a File
+# Exercise 42: Write to a File
 # ======================================
 #
 # Create a file and write a message to it.

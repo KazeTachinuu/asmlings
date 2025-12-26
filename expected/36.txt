@@ -1,4 +1,3 @@
-# echo: read then write
+# hello: print "Hello" to stdout
 X 0
-I Hello
-O Hello
+O Hello\n

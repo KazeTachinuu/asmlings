@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 36: Echo
+# Exercise 38: Echo
 # ======================================
 #
 # Read from stdin, write to stdout.

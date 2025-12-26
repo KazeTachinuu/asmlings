@@ -53,6 +53,10 @@ apply_order() {
 
         # Copy to temp with new number
         cp "$oldfile" "$TMP_DIR/exercises/${new}_${name}.s"
+
+        # Update exercise number in file header (e.g., "Exercise 30:" -> "Exercise 32:")
+        sed -i "s/^# Exercise [0-9]*:/# Exercise $new:/" "$TMP_DIR/exercises/${new}_${name}.s"
+
         [ -f "$EXPECTED_DIR/$old.txt" ] && cp "$EXPECTED_DIR/$old.txt" "$TMP_DIR/expected/$new.txt"
         [ -f "$HINTS_DIR/$old.txt" ] && cp "$HINTS_DIR/$old.txt" "$TMP_DIR/hints/$new.txt"
 

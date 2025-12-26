@@ -1,2 +1,1 @@
-# stack_frame: caller's rbp (73) must be preserved
-X 73
+X 44

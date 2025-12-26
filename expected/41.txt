@@ -1,6 +1,4 @@
-# cat: read file, print to stdout
-F test.txt:File content here
-A test.txt
-O File content here
+# greet: print "Hello, <name>"
+A World
+O Hello, World
 X 0
-C test.txt

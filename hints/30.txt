@@ -1,48 +1,56 @@
 ════════════════════════════════════════
-stack_frame - Setting Up a Stack Frame
+LESSON 30: Leaf Functions
 ════════════════════════════════════════
 
-WHY SAVE %RBP?
+WHAT IS A LEAF FUNCTION?
 
-%rbp is a "callee-saved" register. If a function modifies it,
-it MUST restore the original value before returning.
-
-The caller put 73 in %rbp. After my_func returns, the caller
-expects %rbp to still contain 73.
+A function that doesn't call any other functions.
+Like a "leaf" on a tree - it's at the end of the call chain.
 
 
-THE STANDARD PATTERN
+WHY ARE THEY SPECIAL?
 
-Every function that uses %rbp follows this pattern:
+Leaf functions often don't need a stack frame at all!
 
-  PROLOGUE (at entry):
-    pushq %rbp          # Save old value on stack
-    movq %rsp, %rbp     # Set our frame pointer
-
-  EPILOGUE (before return):
-    popq %rbp           # Restore old value from stack
-    ret                 # Return to caller
+If you don't call other functions:
+  - No need to save the return address (it stays in the stack)
+  - No need to save callee-save registers (if you don't use them)
 
 
-HOW IT WORKS
+THE CALLING CONVENTION
 
-    pushq %rbp     →  Stack now has caller's rbp value saved
-    movq %rsp, %rbp →  Our %rbp points to the saved value
+System V AMD64 (Linux) passes arguments in registers:
 
-    ... function does stuff, maybe clobbers %rbp ...
+  Argument 1:  %rdi
+  Argument 2:  %rsi
+  Argument 3:  %rdx
+  Argument 4:  %rcx
+  Argument 5:  %r8
+  Argument 6:  %r9
 
-    popq %rbp      →  Restore caller's value from stack
-    ret            →  Return with %rbp intact
+  Return value: %rax
+
+
+A MINIMAL ADD FUNCTION
+
+  add:
+      movq %rdi, %rax     # Copy first arg to return register
+      addq %rsi, %rax     # Add second arg
+      ret                 # Return
+
+That's it! No push, no pop, no stack frame.
+
+
+WHEN CAN YOU SKIP THE STACK FRAME?
+
+  ✓ You don't call other functions
+  ✓ You only use caller-save registers (rax, rcx, rdx, rsi, rdi, r8-r11)
+  ✓ You don't need local variables on the stack
 
 
 YOUR TASK
 
-Write the 4 instructions (2 prologue + 2 epilogue):
-
-  Prologue:
-    - Push %rbp onto the stack
-    - Copy %rsp into %rbp
-
-  Epilogue:
-    - Pop the saved value back into %rbp
-    - Return
+Write the simplest possible add function:
+  - Take two arguments from %rdi and %rsi
+  - Return their sum in %rax
+  - Just 2-3 instructions!

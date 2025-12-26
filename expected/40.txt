@@ -1,4 +1,2 @@
-# file_write: create output.txt, write HELLO, also output to stdout
-O HELLO
-X 0
-C output.txt
+# strlen: "Hello" has 5 characters
+X 5

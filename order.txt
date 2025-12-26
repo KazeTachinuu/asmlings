@@ -40,10 +40,12 @@ predict3
 push_pop
 save_restore
 call_ret
+add_leaf
+factorial
 stack_frame
-locals
-args
 callee_save
+locals
+pass_addr
 
 # Part 7: I/O - Output
 hello

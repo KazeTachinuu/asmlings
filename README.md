@@ -2,11 +2,11 @@
 
 Learn x86-64 assembly by fixing small programs. Inspired by [rustlings](https://github.com/rust-lang/rustlings).
 
-**42 exercises** covering:
+**44 exercises** covering:
 - Basics (registers, arithmetic, logic)
 - Memory operations (load, store, addressing)
 - Control flow (comparisons, jumps, loops)
-- Stack and functions (call/ret, stack frames, calling conventions)
+- Stack and functions (leaf functions, recursion, stack frames, calling conventions)
 - System I/O (read, write, files, arguments)
 
 ## Prerequisites

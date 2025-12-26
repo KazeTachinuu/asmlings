@@ -1,52 +1,73 @@
 ════════════════════════════════════════
-locals - Local Variables on the Stack
+LESSON 31: Recursion - Why Stack Frames Exist
 ════════════════════════════════════════
 
-WHY NEGATIVE OFFSETS?
+THE PROBLEM WITH RECURSION
 
-%rbp points to the saved frame pointer. Local variables
-are BELOW it on the stack (lower addresses = negative offsets).
+When factorial(5) calls factorial(4), what happens to n=5?
 
-    high addresses
-         ↑
-    [saved %rbp]     ← %rbp points here (offset 0)
-    [first local]    ← 8 bytes below = -8(%rbp)
-    [second local]   ← 16 bytes below = -16(%rbp)
-         ↓
-    low addresses
+  factorial(5):
+      # n = 5 is in %rdi
+      call factorial      # Now %rdi has n-1 = 4
+      # Oops! n=5 is gone!
+
+The recursive call overwrites our registers!
 
 
-STORING TO A LOCAL
+THE SOLUTION: SAVE BEFORE, RESTORE AFTER
 
-To store a value in a local variable:
-
-    movq $VALUE, OFFSET(%rbp)
-
-The offset is negative. First local is closest to %rbp.
-
-
-LOADING FROM A LOCAL
-
-To load a local variable into a register:
-
-    movq OFFSET(%rbp), %REGISTER
+  factorial:
+      push %rdi           # Save n on the stack
+      subq $1, %rdi       # n-1 for recursive call
+      call factorial      # Result in %rax
+      pop %rbx            # Restore n (into a different register)
+      imulq %rbx, %rax    # n * factorial(n-1)
+      ret
 
 
-ADDING FROM MEMORY
+THE STACK DURING RECURSION
 
-You can add a memory value directly to a register:
+  factorial(3):
+      push %rdi        Stack: [3]
+      call factorial(2)
+          push %rdi    Stack: [3][2]
+          call factorial(1)
+              push %rdi    Stack: [3][2][1]
+              call factorial(0)
+                  returns 1
+              pop %rbx     Stack: [3][2]    rbx=1
+              1 * 1 = 1
+          pop %rbx     Stack: [3]      rbx=2
+          2 * 1 = 2
+      pop %rbx         Stack: []       rbx=3
+      3 * 2 = 6
 
-    addq OFFSET(%rbp), %REGISTER
+
+BASE CASE
+
+Don't forget the base case! Without it, recursion never stops.
+
+  factorial:
+      cmpq $0, %rdi
+      jne .recurse
+      movq $1, %rax       # 0! = 1
+      ret
+
+
+IMULQ - SIGNED MULTIPLICATION
+
+  imulq %src, %dst    # dst = dst * src
+
+Example:
+  imulq %rbx, %rax    # rax = rax * rbx
 
 
 YOUR TASK
 
-Look at the stack diagram in the exercise. Figure out:
-- What offset is the first local?
-- What offset is the second local?
-
-Then write four instructions to:
-1. Store 10 → first local
-2. Store 20 → second local
-3. Load first local → %rdi
-4. Add second local → %rdi
+Complete the factorial function:
+  1. Push %rdi to save n
+  2. Decrement %rdi
+  3. Call factorial recursively
+  4. Pop the saved n
+  5. Multiply: result = n * result
+  6. Return

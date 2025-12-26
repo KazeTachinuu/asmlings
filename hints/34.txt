@@ -1,44 +1,52 @@
 ════════════════════════════════════════
-hello - Your First Output
+locals - Local Variables on the Stack
 ════════════════════════════════════════
 
-THE WRITE SYSCALL
+WHY NEGATIVE OFFSETS?
 
-To write to the screen:
+%rbp points to the saved frame pointer. Local variables
+are BELOW it on the stack (lower addresses = negative offsets).
 
-  movq $1, %rax         # syscall number (write = 1)
-  movq $1, %rdi         # file descriptor (stdout = 1)
-  movq $???, %rsi       # pointer to data
-  movq $???, %rdx       # number of bytes
-  syscall
-
-
-FILE DESCRIPTORS
-
-Every program starts with three open file descriptors:
-  0 = stdin  (keyboard input)
-  1 = stdout (screen output)
-  2 = stderr (error output)
+    high addresses
+         ↑
+    [saved %rbp]     ← %rbp points here (offset 0)
+    [first local]    ← 8 bytes below = -8(%rbp)
+    [second local]   ← 16 bytes below = -16(%rbp)
+         ↓
+    low addresses
 
 
-GETTING THE ADDRESS
+STORING TO A LOCAL
 
-The message is defined in .rodata. To get its address:
+To store a value in a local variable:
 
-  leaq message(%rip), %rsi
+    movq $VALUE, OFFSET(%rbp)
 
-This loads the EFFECTIVE ADDRESS of 'message' into %rsi.
-
-
-THE LENGTH
-
-"Hello" is 5 characters. Put 5 in %rdx.
+The offset is negative. First local is closest to %rbp.
 
 
-PUT IT TOGETHER
+LOADING FROM A LOCAL
 
-Four instructions before syscall:
-  1. Set %rax to 1 (write syscall)
-  2. Set %rdi to 1 (stdout)
-  3. Load address of message into %rsi
-  4. Set %rdx to 5 (length)
+To load a local variable into a register:
+
+    movq OFFSET(%rbp), %REGISTER
+
+
+ADDING FROM MEMORY
+
+You can add a memory value directly to a register:
+
+    addq OFFSET(%rbp), %REGISTER
+
+
+YOUR TASK
+
+Look at the stack diagram in the exercise. Figure out:
+- What offset is the first local?
+- What offset is the second local?
+
+Then write four instructions to:
+1. Store 10 → first local
+2. Store 20 → second local
+3. Load first local → %rdi
+4. Add second local → %rdi

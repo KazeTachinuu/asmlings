@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 35: Read and Count
+# Exercise 37: Read and Count
 # ======================================
 #
 # Read from stdin and exit with the byte count.

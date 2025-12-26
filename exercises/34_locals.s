@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 31: Local Variables
+# Exercise 34: Local Variables
 # ======================================
 #
 # Local variables live on the stack, accessed via %rbp.

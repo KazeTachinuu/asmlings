@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 34: Print Hello
+# Exercise 36: Print Hello
 # ======================================
 #
 # Write a program that prints "Hello" to the screen.

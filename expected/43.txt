@@ -1,0 +1,6 @@
+# cat: read file, print to stdout
+F test.txt:File content here
+A test.txt
+O File content here
+X 0
+C test.txt

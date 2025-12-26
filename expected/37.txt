@@ -1,6 +1,3 @@
-# argc: exit code = argc (number of arguments + 1)
-# With 3 arguments: ./program a b c → argc = 4
-A one
-A two
-A three
+# read_count: exit with byte count
+I test
 X 4
