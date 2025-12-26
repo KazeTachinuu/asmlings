@@ -18,6 +18,7 @@
 # Compilation and execution
 .include "src/compile/testfile.s"
 .include "src/compile/compile.s"
+.include "src/compile/wait.s"
 .include "src/compile/run.s"
 
 # Exercise handling

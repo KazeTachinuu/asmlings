@@ -1,5 +1,6 @@
 # final: no args = read stdin, write stdout
 # Test stdin path (argc == 1)
+T 1000
 I Hello from stdin
 O Hello from stdin
 X 0

@@ -1,3 +1,4 @@
 # read_count: exit with byte count
+T 1000
 I test
 X 4

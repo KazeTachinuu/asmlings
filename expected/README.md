@@ -15,10 +15,12 @@ Each exercise has a corresponding `XX.txt` file that defines validation rules.
 | `F` | Create file | `F <path>:<content>` | `F test.txt:data` |
 | `C` | Cleanup file | `C <path>` | `C test.txt` |
 | `G` | GCC mode | `G [c_file]` | `G` or `G helper.c` |
+| `T` | Timeout | `T <ms>` | `T 2000` |
+| `E` | Expected stderr | `E <text>` | `E Error message` |
 
 ## Escape Sequences
 
-For `O`, `I`, and `F` directives:
+For `O`, `I`, `E`, and `F` directives:
 - `\n` = newline
 - `\\` = literal backslash
 
@@ -83,6 +85,21 @@ O Hello from puts
 G c_helpers/helper.c
 X 0
 ```
+
+### Timeout (prevent infinite loops)
+```
+T 1000
+X 0
+O Done
+```
+Exercise must complete within 1000ms or fail.
+
+### Stderr validation
+```
+X 0
+E Error: file not found
+```
+Validates output written to stderr (fd 2).
 
 ## Notes
 

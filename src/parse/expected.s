@@ -19,6 +19,7 @@ load_expected_file:
     mov dword ptr [rip + test_predict_ans], 0
     mov qword ptr [rip + expected_out_len], 0
     mov qword ptr [rip + expected_in_len], 0
+    mov qword ptr [rip + expected_err_len], 0
     mov dword ptr [rip + test_args_count], 0
     # Initialize args buffer pointer (will be used during parsing)
     lea rax, [rip + test_args_buffer]
@@ -29,6 +30,8 @@ load_expected_file:
     mov qword ptr [rip + test_file_len], 0
     # Initialize gcc mode
     mov byte ptr [rip + test_use_gcc], 0
+    # Initialize timeout (0 = no timeout)
+    mov dword ptr [rip + test_timeout], DEFAULT_TIMEOUT
 
     # Extract exercise number from path
     # Find the filename part (after last /)
@@ -109,6 +112,8 @@ load_expected_file:
     je .lef_parse_output
     cmp al, 'I'
     je .lef_parse_input
+    cmp al, 'E'
+    je .lef_parse_stderr
     cmp al, 'A'
     je .lef_parse_arg
     cmp al, 'F'
@@ -117,6 +122,8 @@ load_expected_file:
     je .lef_parse_cleanup
     cmp al, 'G'
     je .lef_parse_gcc
+    cmp al, 'T'
+    je .lef_parse_timeout
     jmp .lef_next_line
 
 .lef_skip_newline:
@@ -143,87 +150,24 @@ load_expected_file:
     jmp .lef_next_line
 
 .lef_parse_output:
-    # Format: "O Hello World"
     add rbx, 2                      # skip "O "
     lea rdi, [rip + expected_output]
-    xor r12d, r12d                  # length counter
-.lef_copy_output:
-    movzx eax, byte ptr [rbx]
-    cmp al, 10                      # newline
-    je .lef_output_done
-    cmp al, 0
-    je .lef_output_done
-    cmp r12d, 255
-    jge .lef_output_done
-    # Check for escape sequences
-    cmp al, '\\'
-    jne .lef_store_output
-    movzx ecx, byte ptr [rbx + 1]
-    cmp cl, 'n'
-    jne .lef_check_out_bs
-    # \n -> newline
-    mov byte ptr [rdi + r12], 10
-    inc r12d
-    add rbx, 2
-    jmp .lef_copy_output
-.lef_check_out_bs:
-    cmp cl, '\\'
-    jne .lef_store_output
-    # \\ -> single backslash
-    mov byte ptr [rdi + r12], '\\'
-    inc r12d
-    add rbx, 2
-    jmp .lef_copy_output
-.lef_store_output:
-    mov [rdi + r12], al
-    inc r12d
-    inc rbx
-    jmp .lef_copy_output
-.lef_output_done:
-    mov byte ptr [rdi + r12], 0
+    call parse_escaped_content
     mov [rip + expected_out_len], r12
     jmp .lef_next_line
 
 .lef_parse_input:
-    # Format: "I Hello World"
     add rbx, 2                      # skip "I "
     lea rdi, [rip + expected_input]
-    xor r12d, r12d                  # length counter
-.lef_copy_input:
-    movzx eax, byte ptr [rbx]
-    cmp al, 10                      # newline
-    je .lef_input_done
-    cmp al, 0
-    je .lef_input_done
-    cmp r12d, 255
-    jge .lef_input_done
-    # Check for escape sequences
-    cmp al, '\\'
-    jne .lef_store_input
-    movzx ecx, byte ptr [rbx + 1]
-    cmp cl, 'n'
-    jne .lef_check_in_bs
-    # \n -> newline
-    mov byte ptr [rdi + r12], 10
-    inc r12d
-    add rbx, 2
-    jmp .lef_copy_input
-.lef_check_in_bs:
-    cmp cl, '\\'
-    jne .lef_store_input
-    # \\ -> single backslash
-    mov byte ptr [rdi + r12], '\\'
-    inc r12d
-    add rbx, 2
-    jmp .lef_copy_input
-.lef_store_input:
-    mov [rdi + r12], al
-    inc r12d
-    inc rbx
-    jmp .lef_copy_input
-.lef_input_done:
-    mov byte ptr [rdi + r12], 0
+    call parse_escaped_content
     mov [rip + expected_in_len], r12
+    jmp .lef_next_line
+
+.lef_parse_stderr:
+    add rbx, 2                      # skip "E "
+    lea rdi, [rip + expected_stderr]
+    call parse_escaped_content
+    mov [rip + expected_err_len], r12
     jmp .lef_next_line
 
 .lef_parse_arg:
@@ -337,6 +281,15 @@ load_expected_file:
     mov byte ptr [rdi], 0           # null terminate
     jmp .lef_next_line
 
+.lef_parse_timeout:
+    # Format: "T 2000" (timeout in milliseconds)
+    add rbx, 2                      # skip "T "
+    mov rdi, rbx
+    call parse_decimal
+    mov [rip + test_timeout], eax
+    mov rbx, rdi                    # update position
+    jmp .lef_next_line
+
 .lef_parse_gcc:
     # Format: "G" or "G path/to/file.c"
     mov byte ptr [rip + test_use_gcc], 1
@@ -388,4 +341,43 @@ load_expected_file:
     pop r13
     pop r12
     pop rbx
+    ret
+
+# Parse escaped content from rbx to buffer at rdi
+# Handles \n and \\ escape sequences
+# Updates rbx to point past content, returns length in r12
+# rdi = destination buffer, rbx = source position (global)
+parse_escaped_content:
+    xor r12d, r12d                  # length counter
+.pec_loop:
+    movzx eax, byte ptr [rbx]
+    cmp al, 10                      # newline = end
+    je .pec_done
+    cmp al, 0                       # null = end
+    je .pec_done
+    cmp r12d, OUTPUT_MAX_LEN
+    jge .pec_done
+    cmp al, '\\'
+    jne .pec_store
+    movzx ecx, byte ptr [rbx + 1]
+    cmp cl, 'n'
+    jne .pec_check_bs
+    mov byte ptr [rdi + r12], 10    # \n -> newline
+    inc r12d
+    add rbx, 2
+    jmp .pec_loop
+.pec_check_bs:
+    cmp cl, '\\'
+    jne .pec_store
+    mov byte ptr [rdi + r12], '\\'  # \\ -> backslash
+    inc r12d
+    add rbx, 2
+    jmp .pec_loop
+.pec_store:
+    mov [rdi + r12], al
+    inc r12d
+    inc rbx
+    jmp .pec_loop
+.pec_done:
+    mov byte ptr [rdi + r12], 0     # null terminate
     ret

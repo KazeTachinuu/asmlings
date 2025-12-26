@@ -58,6 +58,8 @@ msg_failed:         .asciz "✗ Compilation failed\n"
 msg_wrong_exit:     .asciz "✗ Wrong exit code: got "
 msg_wrong_predict:  .asciz "✗ Wrong prediction! Try again.\n"
 msg_wrong_output:   .asciz "✗ Wrong output\n"
+msg_timeout:        .asciz "✗ Timeout! Possible infinite loop.\n"
+msg_wrong_stderr:   .asciz "✗ Wrong stderr output\n"
 msg_expected_out:   .asciz "Expected: \""
 msg_actual_out:     .asciz "Got:      \""
 msg_quote_end:      .asciz "\"\n"
@@ -98,6 +100,11 @@ sleeptime:
     .quad 0
     .quad 100000000     # 100ms
 
+.align 8
+poll_sleeptime:
+    .quad 0
+    .quad 10000000      # 10ms for timeout polling
+
 .section .bss
 
 .align 8
@@ -115,12 +122,18 @@ last_exit_actual:   .skip 8
 last_exit_expected: .skip 8
 
 # Output buffers for exercises that print to stdout
-expected_output:    .skip 256
-actual_output:      .skip 256
+expected_output:    .skip 4096
+actual_output:      .skip 4096
 expected_out_len:   .skip 8
-expected_input:     .skip 256
+expected_input:     .skip 4096
 expected_in_len:    .skip 8
 actual_out_len:     .skip 8
+
+# Stderr buffers for exercises that print to stderr
+expected_stderr:    .skip 4096
+actual_stderr:      .skip 4096
+expected_err_len:   .skip 8
+actual_err_len:     .skip 8
 
 # Expected file parsing
 expected_buffer:    .skip 4096
@@ -146,6 +159,9 @@ test_has_cleanup:   .skip 1
 # GCC mode (G directive for C interop)
 test_use_gcc:       .skip 1
 test_c_file:        .skip 256
+
+# Timeout (T directive) - in milliseconds
+test_timeout:       .skip 4
 
 # Environment pointer (for gcc which needs PATH)
 saved_envp:         .skip 8

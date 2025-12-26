@@ -37,6 +37,9 @@ cmd_run:
     mov rdi, r12
     call load_expected_file
 
+    # Disable timeout for interactive run
+    mov dword ptr [rip + test_timeout], 0
+
     # Compile
     mov rdi, r12
     call compile_exercise

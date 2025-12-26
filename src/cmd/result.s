@@ -17,6 +17,10 @@ print_result:
     je .pr_wrong_output
     cmp ebx, STATE_WRONG_PREDICT
     je .pr_wrong_predict
+    cmp ebx, STATE_TIMEOUT
+    je .pr_timeout
+    cmp ebx, STATE_WRONG_STDERR
+    je .pr_wrong_stderr
 
     # Compilation failed
     lea rdi, [rip + color_red]
@@ -82,6 +86,18 @@ print_result:
 .pr_wrong_predict:
     lea rdi, [rip + color_red]
     lea rsi, [rip + msg_wrong_predict]
+    call print_colored
+    jmp .pr_done
+
+.pr_timeout:
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_timeout]
+    call print_colored
+    jmp .pr_done
+
+.pr_wrong_stderr:
+    lea rdi, [rip + color_red]
+    lea rsi, [rip + msg_wrong_stderr]
     call print_colored
 
 .pr_done:

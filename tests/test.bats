@@ -441,6 +441,17 @@ load helpers
     test_cleanup
 }
 
+@test "G: links with C helper file" {
+    test_setup
+    load_fixture multiply3 gcc_c_helper
+    cp -r c_helpers "$TESTDIR/"
+
+    out=$(asmlings list)
+    assert_contains "$out" "1/1"
+
+    test_cleanup
+}
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # HINT COMMAND
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -600,6 +611,84 @@ load helpers
 
     out=$(asmlings check 99)
     assert_contains "$out" "not found"
+
+    test_cleanup
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# T DIRECTIVE - Timeout
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@test "T: infinite loop times out" {
+    test_setup
+    load_fixture infinite_loop timeout
+
+    out=$(asmlings check 01)
+    assert_contains "$out" "Timeout"
+
+    test_cleanup
+}
+
+@test "T: fast program passes with timeout" {
+    test_setup
+    load_exercise exit0 "T 1000\nX 0"
+
+    out=$(asmlings list)
+    assert_contains "$out" "1/1"
+
+    test_cleanup
+}
+
+@test "T: no timeout without directive" {
+    test_setup
+    load_fixture exit0 exit0
+
+    out=$(asmlings list)
+    assert_contains "$out" "1/1"
+
+    test_cleanup
+}
+
+@test "T: timeout works with stdin piping" {
+    test_setup
+    load_fixture loop_after_read loop_after_read
+
+    out=$(asmlings check 01)
+    assert_contains "$out" "Timeout"
+
+    test_cleanup
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# E DIRECTIVE - Stderr capture
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@test "E: correct stderr passes" {
+    test_setup
+    load_fixture print_stderr print_stderr
+
+    out=$(asmlings list)
+    assert_contains "$out" "1/1"
+
+    test_cleanup
+}
+
+@test "E: wrong stderr fails" {
+    test_setup
+    load_exercise print_stderr "X 0\nE Wrong"
+
+    out=$(asmlings check 01)
+    assert_contains "$out" "stderr"
+
+    test_cleanup
+}
+
+@test "E: supports \\n escape" {
+    test_setup
+    load_exercise print_stderr "X 0\nE Error"
+
+    out=$(asmlings list)
+    assert_contains "$out" "1/1"
 
     test_cleanup
 }

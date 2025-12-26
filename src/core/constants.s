@@ -31,7 +31,7 @@
 .equ SOURCE_BUFFER_SIZE,    65536
 .equ HINT_BUFFER_SIZE,      4096
 .equ EXPECTED_BUF_SIZE,     4096
-.equ OUTPUT_MAX_LEN,        255     # max output to capture (buffer is 256)
+.equ OUTPUT_MAX_LEN,        4095    # max output to capture (buffer is 4096)
 
 # Exercise states
 .equ STATE_NOT_DONE,        0
@@ -40,7 +40,24 @@
 .equ STATE_WRONG_EXIT,      3
 .equ STATE_WRONG_OUTPUT,    4
 .equ STATE_WRONG_PREDICT,   5
+.equ STATE_TIMEOUT,         6
+.equ STATE_WRONG_STDERR,    7
 
 # Syscalls for pipes
 .equ SYS_PIPE,              22
 .equ SYS_DUP2,              33
+.equ SYS_KILL,              62
+
+# Signals
+.equ SIGKILL,               9
+
+# Wait flags
+.equ WNOHANG,               1
+
+# Default timeout in milliseconds (0 = no timeout)
+.equ DEFAULT_TIMEOUT,       0
+
+# Poll events
+.equ POLLIN,                0x0001
+.equ POLLHUP,               0x0010
+.equ SYS_POLL,              7

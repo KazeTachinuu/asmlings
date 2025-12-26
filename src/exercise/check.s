@@ -52,6 +52,10 @@ check_exercise:
     call run_exercise
     mov r13, rax                    # r13 = actual exit code
 
+    # Check for timeout (-2 return value)
+    cmp r13, -2
+    je .check_timeout
+
     # Cleanup test file if needed (C directive)
     call cleanup_test_file
 
@@ -62,7 +66,7 @@ check_exercise:
 
     # If expected output, compare it
     test r15, r15
-    jz .check_passed
+    jz .check_stderr                # no stdout expected, check stderr
 
     # Compare actual output with expected
     mov rdi, [rip + actual_out_len]
@@ -75,6 +79,24 @@ check_exercise:
     call memcmp
     test eax, eax
     jnz .check_wrong_output
+
+.check_stderr:
+    # If expected stderr, compare it
+    mov r15, [rip + expected_err_len]
+    test r15, r15
+    jz .check_passed
+
+    # Compare actual stderr with expected
+    mov rdi, [rip + actual_err_len]
+    cmp rdi, r15
+    jne .check_wrong_stderr
+
+    lea rdi, [rip + actual_stderr]
+    lea rsi, [rip + expected_stderr]
+    mov rcx, r15
+    call memcmp
+    test eax, eax
+    jnz .check_wrong_stderr
 
 .check_passed:
     mov eax, STATE_PASSED
@@ -95,12 +117,21 @@ check_exercise:
     mov eax, STATE_PASSED
     jmp .check_done
 
+.check_timeout:
+    call cleanup_test_file          # still need to cleanup
+    mov eax, STATE_TIMEOUT
+    jmp .check_done
+
 .check_wrong_predict:
     mov eax, STATE_WRONG_PREDICT
     jmp .check_done
 
 .check_wrong_output:
     mov eax, STATE_WRONG_OUTPUT
+    jmp .check_done
+
+.check_wrong_stderr:
+    mov eax, STATE_WRONG_STDERR
     jmp .check_done
 
 .check_wrong_exit:
