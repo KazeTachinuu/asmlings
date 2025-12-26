@@ -47,21 +47,25 @@ callee_save
 locals
 pass_addr
 
-# Part 7: I/O - Output
+# Part 7: C Interop
+c_call_asm
+asm_call_c
+
+# Part 8: I/O - Output
 hello
 
-# Part 8: I/O - Input
+# Part 9: I/O - Input
 read_count
 echo
 
-# Part 9: I/O - Arguments
+# Part 10: I/O - Arguments
 argc
 strlen
 greet
 
-# Part 10: I/O - Files
+# Part 11: I/O - Files
 file_write
 cat
 
-# Part 11: Capstone
+# Part 12: Capstone
 final

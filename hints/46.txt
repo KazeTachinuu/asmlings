@@ -1,0 +1,59 @@
+════════════════════════════════════════
+final - The Capstone Challenge
+════════════════════════════════════════
+
+YOU MADE IT!
+
+Write a program that:
+  - If argc > 1: open argv[1] as file, output contents
+  - If argc == 1: read stdin, output to stdout
+
+
+THE STRUCTURE
+
+.global _start
+
+.section .bss
+buffer: .skip 4096
+
+.section .text
+_start:
+    # Check argc
+    # Branch to file_mode or stdin_mode
+    # Read (from file or stdin)
+    # Write to stdout
+    # Exit
+
+
+CHECKING ARGC
+
+At _start, the stack contains:
+    [rsp]     = argc
+    [rsp+8]   = argv[0]
+    [rsp+16]  = argv[1]  (if argc > 1)
+
+Compare argc with 1:
+    cmpq $1, (%rsp)
+    je stdin_mode       # argc == 1, no file arg
+
+
+FILE MODE
+
+Open: rax=2, rdi=filename, rsi=0 (O_RDONLY)
+Read: rax=0, rdi=fd, rsi=buffer, rdx=size
+Write: rax=1, rdi=1, rsi=buffer, rdx=bytes
+Close: rax=3, rdi=fd
+
+
+STDIN MODE
+
+Read: rax=0, rdi=0, rsi=buffer, rdx=size
+Write: rax=1, rdi=1, rsi=buffer, rdx=bytes
+
+
+REFERENCE
+
+Look back at:
+  - Exercise 37 (argc)
+  - Exercise 41 (cat)
+  - Exercise 36 (echo)

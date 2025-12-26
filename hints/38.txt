@@ -1,43 +1,44 @@
 ════════════════════════════════════════
-echo - Combining Read and Write
+hello - Your First Output
 ════════════════════════════════════════
 
-THE CHALLENGE
+THE WRITE SYSCALL
 
-After read syscall:
-  %rax = byte count
+To write to the screen:
 
-For write syscall, you need:
-  %rax = 1 (syscall number)
-  %rdx = byte count
-
-The problem: read's return value is in %rax, but you need
-to put 1 in %rax for the write syscall!
+  movq $1, %rax         # syscall number (write = 1)
+  movq $1, %rdi         # file descriptor (stdout = 1)
+  movq $???, %rsi       # pointer to data
+  movq $???, %rdx       # number of bytes
+  syscall
 
 
-THE SOLUTION
+FILE DESCRIPTORS
 
-Save the byte count before you overwrite %rax:
-
-  # After read:
-  movq %rax, %r12       # Save byte count in r12
-
-  # For write:
-  movq $1, %rax         # Now safe to set syscall number
-  movq %r12, %rdx       # Use saved byte count
+Every program starts with three open file descriptors:
+  0 = stdin  (keyboard input)
+  1 = stdout (screen output)
+  2 = stderr (error output)
 
 
-THE COMPLETE FLOW
+GETTING THE ADDRESS
 
-1. Read from stdin (fd=0) into buffer
-2. Save byte count from %rax to another register
-3. Set up write syscall (fd=1, buffer address, saved length)
-4. Call syscall
-5. Exit with 0
+The message is defined in .rodata. To get its address:
+
+  leaq message(%rip), %rsi
+
+This loads the EFFECTIVE ADDRESS of 'message' into %rsi.
 
 
-REGISTER CHOICE
+THE LENGTH
 
-Use any register that won't be overwritten. The callee-saved
-registers (%r12-%r15) are traditional choices for values you
-want to preserve across function calls.
+"Hello\n" is 6 bytes (5 letters + newline). Put 6 in %rdx.
+
+
+PUT IT TOGETHER
+
+Four instructions before syscall:
+  1. Set %rax to 1 (write syscall)
+  2. Set %rdi to 1 (stdout)
+  3. Load address of message into %rsi
+  4. Set %rdx to 6 (length including newline)

@@ -1,0 +1,50 @@
+════════════════════════════════════════
+cat - Read and Print a File
+════════════════════════════════════════
+
+THE COMPLETE PIPELINE
+
+1. Get filename from argv[1]
+2. Open the file (read-only)
+3. Read into buffer
+4. Write buffer to stdout
+5. Close file
+6. Exit
+
+
+OPENING FOR READ
+
+  movq $2, %rax           # syscall: open
+  movq %r12, %rdi         # filename from argv[1]
+  xorq %rsi, %rsi         # flags: 0 = O_RDONLY
+  syscall
+
+No mode needed for read-only (only used when creating).
+
+
+READING THE FILE
+
+After open, save fd then read:
+  movq %rax, %r13         # save fd
+  movq $0, %rax           # syscall: read
+  movq %r13, %rdi         # fd
+  leaq buffer(%rip), %rsi
+  movq $4096, %rdx        # buffer size
+  syscall
+
+
+WRITING TO STDOUT
+
+Read returns byte count in %rax. Save it, then:
+  movq $1, %rax           # syscall: write
+  movq $1, %rdi           # fd: stdout
+  leaq buffer(%rip), %rsi
+  movq %r14, %rdx         # saved byte count
+  syscall
+
+
+CLOSING THE FILE
+
+  movq $3, %rax           # syscall: close
+  movq %r13, %rdi         # saved fd
+  syscall
