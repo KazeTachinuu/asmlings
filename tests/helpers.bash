@@ -6,8 +6,9 @@ TESTDIR="/tmp/asmlings_test_$$"
 # Setup test environment
 test_setup() {
     rm -rf "$TESTDIR"
-    mkdir -p "$TESTDIR/exercises" "$TESTDIR/hints" "$TESTDIR/expected"
+    mkdir -p "$TESTDIR/exercises" "$TESTDIR/hints" "$TESTDIR/expected" "$TESTDIR/scripts"
     cp ./asmlings "$TESTDIR/"
+    cp ./scripts/*.sh "$TESTDIR/scripts/"
 }
 
 # Cleanup test environment
