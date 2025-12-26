@@ -17,7 +17,6 @@
 #
 # YOUR TASK: Zero out %rdi using XOR, then exit.
 #
-# Expected exit code: 0
 # ======================================
 
 # I AM NOT DONE

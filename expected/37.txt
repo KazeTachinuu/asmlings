@@ -1,0 +1,6 @@
+# argc: exit code = argc (number of arguments + 1)
+# With 3 arguments: ./program a b c → argc = 4
+A one
+A two
+A three
+X 4

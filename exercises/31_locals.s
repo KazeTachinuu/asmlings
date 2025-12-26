@@ -1,20 +1,22 @@
 # ======================================
-# Exercise 31: Local Variables on the Stack
+# Exercise 31: Local Variables
 # ======================================
 #
-# After the prologue, allocate space by subtracting from %rsp:
+# Local variables live on the stack, accessed via %rbp.
 #
-#   subq $16, %rsp      # Allocate 16 bytes for locals
+# Stack layout after prologue + allocation:
 #
-# Access locals relative to %rbp:
-#   -8(%rbp)   = first local (8 bytes)
-#   -16(%rbp)  = second local (8 bytes)
+#     │    ...caller...   │
+#     │   return address  │
+#     │    saved %rbp     │ ← %rbp points here
+#     │     local_a       │ ← -8(%rbp)
+#     │     local_b       │ ← -16(%rbp)
+#     └───────────────────┘ ← %rsp
 #
-# IMPORTANT: Always allocate in multiples of 16 for alignment!
+# Negative offsets because stack grows downward!
 #
-# YOUR TASK: Store 10 at -8(%rbp), store 20 at -16(%rbp), add them.
+# YOUR TASK: Use two local variables to compute 10 + 20.
 #
-# Expected exit code: 30
 # ======================================
 
 # I AM NOT DONE
@@ -28,18 +30,19 @@ _start:
     syscall
 
 add_locals:
+    # Prologue
     pushq %rbp
     movq %rsp, %rbp
-    subq $16, %rsp          # Space for two 64-bit locals
+    subq $16, %rsp          # Room for two 64-bit locals
 
     # YOUR CODE HERE:
-    # 1. Store 10 at -8(%rbp)
-    # 2. Store 20 at -16(%rbp)
-    # 3. Load -8(%rbp) into %rdi
-    # 4. Add -16(%rbp) to %rdi
+    # 1. Store 10 in the first local variable
+    # 2. Store 20 in the second local variable
+    # 3. Load first local into %rdi
+    # 4. Add second local to %rdi
 
 
     # Epilogue
-    movq %rbp, %rsp         # Deallocate locals
+    movq %rbp, %rsp
     popq %rbp
     ret

@@ -1,0 +1,4 @@
+X 0
+F testfile.txt:ExactContent123
+A testfile.txt
+O ExactContent123

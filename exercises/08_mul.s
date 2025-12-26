@@ -13,7 +13,6 @@
 # YOUR TASK: Calculate 7 * 8 and exit with the result.
 #            The values are already in registers. Multiply them.
 #
-# Expected exit code: 56
 # ======================================
 
 # I AM NOT DONE

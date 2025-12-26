@@ -10,7 +10,6 @@
 #
 # YOUR TASK: We have 100 in %rdi. Make it 77.
 #
-# Expected exit code: 77
 # ======================================
 
 # I AM NOT DONE

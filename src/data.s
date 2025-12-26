@@ -22,8 +22,11 @@ ld_arg2:            .asciz "-o"
 
 # Markers we check for
 marker_not_done:    .asciz "I AM NOT DONE"
-marker_expected:    .asciz "Expected exit code:"
-marker_output:      .asciz "Expected output:"
+marker_prediction:  .asciz "Prediction:"
+
+# Paths for expected files
+expected_dir:       .asciz "expected/"
+ext_txt:            .asciz ".txt"
 
 # Terminal control
 clear_screen:       .asciz "\033[2J\033[H"
@@ -89,9 +92,8 @@ symbol_check:       .asciz "✓"
 progress_filled:    .asciz "█"
 progress_empty:     .asciz "░"
 
-# File extensions and patterns
+# File extensions
 ext_s:              .asciz ".s"
-pattern_predict:    .asciz "predict"
 
 .align 8
 sleeptime:
@@ -119,4 +121,27 @@ last_exit_expected: .skip 8
 expected_output:    .skip 256
 actual_output:      .skip 256
 expected_out_len:   .skip 8
+expected_input:     .skip 256
+expected_in_len:    .skip 8
 actual_out_len:     .skip 8
+
+# Expected file parsing
+expected_buffer:    .skip 4096
+expected_path_buf:  .skip 24
+test_exit_code:     .skip 4
+test_is_predict:    .skip 1
+test_predict_ans:   .skip 4
+
+# Command-line arguments for exercises
+test_args_buffer:   .skip 1024
+test_args_ptrs:     .skip 64
+test_args_count:    .skip 4
+test_args_buf_ptr:  .skip 8
+
+# Test files (F/C directives)
+test_file_path:     .skip 256
+test_file_content:  .skip 1024
+test_file_len:      .skip 8
+test_cleanup_path:  .skip 256
+test_has_file:      .skip 1
+test_has_cleanup:   .skip 1

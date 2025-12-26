@@ -1,0 +1,2 @@
+# swap: exit with new value of a (20 after swap)
+X 20

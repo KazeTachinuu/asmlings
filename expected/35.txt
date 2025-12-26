@@ -1,0 +1,3 @@
+# read_count: exit with byte count
+I test
+X 4

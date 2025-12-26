@@ -1,0 +1,65 @@
+# Asmlings Exercise Order
+
+# Part 1: Basics
+intro
+exit_code
+mov
+registers
+add
+sub
+
+# Part 2: Arithmetic
+predict1
+mul
+div
+
+# Part 3: Logic
+and
+or
+xor
+shifts
+lea
+debug1
+
+# Part 4: Memory
+load
+swap
+bytes
+
+# Part 5: Control Flow
+predict2
+cmp
+jumps
+test
+loop
+loop_sum
+debug2
+predict3
+
+# Part 6: Stack & Functions
+push_pop
+save_restore
+call_ret
+stack_frame
+locals
+args
+callee_save
+
+# Part 7: I/O - Output
+hello
+
+# Part 8: I/O - Input
+read_count
+echo
+
+# Part 9: I/O - Arguments
+argc
+strlen
+greet
+
+# Part 10: I/O - Files
+file_write
+cat
+
+# Part 11: Capstone
+final

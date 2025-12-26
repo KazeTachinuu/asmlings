@@ -12,7 +12,6 @@
 #
 # YOUR TASK: Make this program exit with code 42.
 #
-# Expected exit code: 42
 # ======================================
 
 # I AM NOT DONE

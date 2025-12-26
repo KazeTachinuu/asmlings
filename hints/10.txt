@@ -23,18 +23,18 @@ MASKING
 
 AND is used to "mask" bits - keeping only certain bits while zeroing others.
 
-A mask of 0xFF (binary: 11111111) keeps the lowest 8 bits:
+A mask of 0x0F (binary: 00001111) keeps the lowest 4 bits (one nibble):
 
-  Value:  0x1234   = 0001 0010 0011 0100
-  Mask:   0x00FF   = 0000 0000 1111 1111
-  Result: 0x0034   = 0000 0000 0011 0100
+  Value:  0xAB   = 1010 1011
+  Mask:   0x0F   = 0000 1111
+  Result: 0x0B   = 0000 1011
 
-The high bits become 0, the low 8 bits are preserved.
+The high bits become 0, the low 4 bits are preserved.
 
 
 COMMON MASKS
 
-  0x0F      Keep lowest 4 bits (one hex digit)
+  0x0F      Keep lowest 4 bits (one nibble/hex digit)
   0xFF      Keep lowest 8 bits (one byte)
   0xFFFF    Keep lowest 16 bits (two bytes)
   0xFFFFFF  Keep lowest 24 bits (three bytes)
@@ -42,13 +42,13 @@ COMMON MASKS
 
 THE PROBLEM
 
-You have 0x1234 in %rdi.
-You need to extract just the low byte: 0x34 = 52 decimal.
+You have 0xAB (171 decimal) in %rdi.
+You need to extract just the low nibble: 0x0B = 11 decimal.
 
 
 YOUR TASK
 
-Apply an AND mask to keep only the lowest 8 bits.
+Apply an AND mask to keep only the lowest 4 bits.
 
   andq $MASK, %rdi
 

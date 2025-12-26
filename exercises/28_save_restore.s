@@ -11,7 +11,6 @@
 #
 # YOUR TASK: Save %rdi before it gets clobbered, then restore it.
 #
-# Expected exit code: 55
 # ======================================
 
 # I AM NOT DONE

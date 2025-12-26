@@ -1,5 +1,5 @@
 # ======================================
-# Exercise 37: Capstone - Implement strlen
+# Exercise 38: Capstone - Implement strlen
 # ======================================
 #
 # C strings are null-terminated (end with byte 0).
@@ -20,7 +20,6 @@
 #
 # YOUR TASK: Complete the strlen function.
 #
-# Expected exit code: 5 (length of "Hello")
 # ======================================
 
 # I AM NOT DONE

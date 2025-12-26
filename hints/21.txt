@@ -37,12 +37,15 @@ UNCONDITIONAL JUMP
 
 THE CODE
 
-  cmpq $20, %rax     # 10 - 20 = -10 (negative)
+  cmpq $20, %rax     # 30 - 20 = 10 (positive)
 
-  10 is LESS than 20.
+  30 is NOT less than 20.
 
-  Currently it uses "jmp" which ALWAYS jumps.
+  Currently it uses "jmp" which ALWAYS jumps to is_less.
+  But 30 >= 20, so we should NOT jump! We should fall through.
+
   You need a CONDITIONAL jump that only jumps when less-than is true.
+  Since 30 is NOT less than 20, jl should NOT jump.
 
 
 YOUR TASK

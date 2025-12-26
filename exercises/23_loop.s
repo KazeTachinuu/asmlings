@@ -16,7 +16,6 @@
 # YOUR TASK: Complete the loop to add 1 to %rdi five times.
 #            Result should be 5.
 #
-# Expected exit code: 5
 # ======================================
 
 # I AM NOT DONE

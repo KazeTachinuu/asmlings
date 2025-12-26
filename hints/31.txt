@@ -1,74 +1,52 @@
 ════════════════════════════════════════
-LESSON 31: Local Variables on the Stack
+locals - Local Variables on the Stack
 ════════════════════════════════════════
 
-ALLOCATING SPACE
+WHY NEGATIVE OFFSETS?
 
-After the prologue, reserve space for local variables:
+%rbp points to the saved frame pointer. Local variables
+are BELOW it on the stack (lower addresses = negative offsets).
 
-  subq $16, %rsp        # Allocate 16 bytes
-
-Always allocate in multiples of 16 for proper alignment!
-
-
-ACCESSING LOCAL VARIABLES
-
-Use negative offsets from %rbp:
-
-  -8(%rbp)    = first 8-byte local
-  -16(%rbp)   = second 8-byte local
-
-Why negative? Because the stack grows down:
-
-  [saved rbp]     <- %rbp points here (offset 0)
-  [local 1]       <- -8(%rbp)
-  [local 2]       <- -16(%rbp)
+    high addresses
+         ↑
+    [saved %rbp]     ← %rbp points here (offset 0)
+    [first local]    ← 8 bytes below = -8(%rbp)
+    [second local]   ← 16 bytes below = -16(%rbp)
+         ↓
+    low addresses
 
 
-STORING A VALUE
+STORING TO A LOCAL
 
-  movq $10, -8(%rbp)    # Store 10 in first local
+To store a value in a local variable:
 
-This is like:
-  int a = 10;
+    movq $VALUE, OFFSET(%rbp)
 
-
-LOADING A VALUE
-
-  movq -8(%rbp), %rax   # Load first local into %rax
+The offset is negative. First local is closest to %rbp.
 
 
-DEALLOCATING
+LOADING FROM A LOCAL
 
-Before the epilogue, clean up:
+To load a local variable into a register:
 
-  movq %rbp, %rsp       # Reset stack pointer to saved position
-
-Or just: addq $16, %rsp  (if you know the exact size)
+    movq OFFSET(%rbp), %REGISTER
 
 
-COMPLETE PATTERN
+ADDING FROM MEMORY
 
-  my_func:
-      pushq %rbp
-      movq %rsp, %rbp
-      subq $16, %rsp          # Allocate 2 locals
+You can add a memory value directly to a register:
 
-      movq $10, -8(%rbp)      # local1 = 10
-      movq $20, -16(%rbp)     # local2 = 20
-
-      movq -8(%rbp), %rax     # Load local1
-      addq -16(%rbp), %rax    # Add local2
-
-      movq %rbp, %rsp         # Deallocate
-      popq %rbp
-      ret
+    addq OFFSET(%rbp), %REGISTER
 
 
 YOUR TASK
 
-Fill in four instructions:
-  1. Store 10 at -8(%rbp)
-  2. Store 20 at -16(%rbp)
-  3. Load -8(%rbp) into %rdi
-  4. Add -16(%rbp) to %rdi
+Look at the stack diagram in the exercise. Figure out:
+- What offset is the first local?
+- What offset is the second local?
+
+Then write four instructions to:
+1. Store 10 → first local
+2. Store 20 → second local
+3. Load first local → %rdi
+4. Add second local → %rdi

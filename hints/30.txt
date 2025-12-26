@@ -1,63 +1,48 @@
 ════════════════════════════════════════
-LESSON 30: Stack Frames - Prologue and Epilogue
+stack_frame - Setting Up a Stack Frame
 ════════════════════════════════════════
 
-WHY STACK FRAMES?
+WHY SAVE %RBP?
 
-In complex functions, %rsp changes as we push/pop values.
-A "stack frame" gives us a stable reference point.
+%rbp is a "callee-saved" register. If a function modifies it,
+it MUST restore the original value before returning.
 
-%rbp (Base Pointer) marks the "bottom" of our function's stack area.
-
-
-THE STANDARD PROLOGUE
-
-At the START of every proper function:
-
-  pushq %rbp            # Save caller's base pointer
-  movq %rsp, %rbp       # Set our base pointer to current stack top
-
-After this:
-  - Old %rbp is saved on the stack
-  - Our %rbp points to where %rsp was when we started
-  - We can use %rbp as a stable reference
+The caller put 73 in %rbp. After my_func returns, the caller
+expects %rbp to still contain 73.
 
 
-THE STANDARD EPILOGUE
+THE STANDARD PATTERN
 
-At the END, before ret:
+Every function that uses %rbp follows this pattern:
 
-  popq %rbp             # Restore caller's base pointer
-  ret                   # Return to caller
+  PROLOGUE (at entry):
+    pushq %rbp          # Save old value on stack
+    movq %rsp, %rbp     # Set our frame pointer
 
-Or use the special instruction:
-
-  leave                 # Same as: movq %rbp, %rsp; popq %rbp
-  ret
-
-
-STACK FRAME LAYOUT
-
-  High addresses
-       │
-       │ [caller's data]
-       │ [return address]      <- pushed by call
-       │ [saved rbp]           <- pushed by prologue, rbp points here
-       │ [local variables]     <- our function's space
-       ↓
-  Low addresses (rsp points here)
+  EPILOGUE (before return):
+    popq %rbp           # Restore old value from stack
+    ret                 # Return to caller
 
 
-WHY BOTHER?
+HOW IT WORKS
 
-1. Debuggers use %rbp to walk the call stack
-2. Local variables are accessed relative to %rbp
-3. Even as %rsp changes, %rbp stays fixed within the function
+    pushq %rbp     →  Stack now has caller's rbp value saved
+    movq %rsp, %rbp →  Our %rbp points to the saved value
+
+    ... function does stuff, maybe clobbers %rbp ...
+
+    popq %rbp      →  Restore caller's value from stack
+    ret            →  Return with %rbp intact
 
 
 YOUR TASK
 
-Add the prologue (two instructions at the start) and
-the epilogue (one instruction before ret).
+Write the 4 instructions (2 prologue + 2 epilogue):
 
-The pattern is always the same.
+  Prologue:
+    - Push %rbp onto the stack
+    - Copy %rsp into %rbp
+
+  Epilogue:
+    - Pop the saved value back into %rbp
+    - Return

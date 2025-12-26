@@ -15,10 +15,9 @@
 #   jb   jump if below      (unsigned <)
 #   ja   jump if above      (unsigned >)
 #
-# YOUR TASK: Is 10 less than 20?
+# YOUR TASK: Is 30 less than 20?
 #            Change 'jmp' to the correct conditional jump.
 #
-# Expected exit code: 1
 # ======================================
 
 # I AM NOT DONE
@@ -27,8 +26,8 @@
 .text
 
 _start:
-    movq $10, %rax
-    cmpq $20, %rax          # Compare: 10 vs 20
+    movq $30, %rax
+    cmpq $20, %rax          # Compare: 30 vs 20
     jmp is_less             # WRONG! This always jumps. Fix it.
 
     movq $0, %rdi           # This means "not less"
@@ -42,5 +41,5 @@ exit:
     syscall
 
 # THINK: After cmpq $20, %rax:
-#   The CPU computes 10 - 20 = -10 (negative)
-#   What conditional jump checks for "less than"?
+#   The CPU computes 30 - 20 = 10 (positive)
+#   Is 30 < 20? No! So jl should NOT jump.

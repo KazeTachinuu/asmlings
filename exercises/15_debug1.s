@@ -10,7 +10,6 @@
 #   2. Trace the values mentally (or use GDB)
 #   3. Find where reality differs from expectation
 #
-# Expected exit code: 60
 # ======================================
 
 # I AM NOT DONE

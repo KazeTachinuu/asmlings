@@ -18,7 +18,6 @@
 # YOUR TASK: The comparison checks if %rdi equals 50.
 #            Fix the initial value so the comparison succeeds.
 #
-# Expected exit code: 0
 # ======================================
 
 # I AM NOT DONE

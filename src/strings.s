@@ -157,6 +157,32 @@ memcmp:
     mov eax, 1
     ret
 
+# str_append: Append string rsi to string rdi
+# Finds end of rdi and copies rsi there
+# Returns destination in rax
+str_append:
+    push rdi
+    push rsi
+    # Find end of destination
+.str_append_find:
+    cmp byte ptr [rdi], 0
+    je .str_append_copy
+    inc rdi
+    jmp .str_append_find
+.str_append_copy:
+    mov al, [rsi]
+    mov [rdi], al
+    test al, al
+    jz .str_append_done
+    inc rsi
+    inc rdi
+    jmp .str_append_copy
+.str_append_done:
+    pop rsi
+    pop rdi
+    mov rax, rdi
+    ret
+
 # get_filename_ptr: Get pointer to filename part of path (after last /)
 # rdi = path
 # Returns pointer in rax

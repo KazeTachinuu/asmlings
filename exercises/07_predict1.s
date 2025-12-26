@@ -5,7 +5,8 @@
 # Trace through the code mentally. What will the exit code be?
 # Replace ??? with your answer.
 #
-# Expected exit code: ???
+# Prediction: ???
+#
 # ======================================
 
 

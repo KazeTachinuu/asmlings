@@ -17,7 +17,6 @@
 # YOUR TASK: Load the first byte of 'data' into %edi.
 #            ASCII 'A' = 65
 #
-# Expected exit code: 65
 # ======================================
 
 # I AM NOT DONE

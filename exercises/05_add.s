@@ -12,7 +12,6 @@
 #
 # THINK: What number plus 10 equals 42?
 #
-# Expected exit code: 42
 # ======================================
 
 # I AM NOT DONE

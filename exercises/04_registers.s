@@ -14,7 +14,6 @@
 #
 # THINK: Which register does the exit syscall read for the exit code?
 #
-# Expected exit code: 99
 # ======================================
 
 # I AM NOT DONE

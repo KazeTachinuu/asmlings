@@ -1,0 +1,5 @@
+X 0
+F test.txt:WrongContent
+A test.txt
+O FileContent
+C test.txt

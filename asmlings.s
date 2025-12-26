@@ -6,6 +6,7 @@
 .include "src/print.s"
 .include "src/exercises.s"
 .include "src/check.s"
+.include "src/expected.s"
 .include "src/hints.s"
 .include "src/commands.s"
 .include "src/main.s"

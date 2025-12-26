@@ -19,7 +19,6 @@
 #
 # YOUR TASK: Calculate 100 / 4 = 25
 #
-# Expected exit code: 25
 # ======================================
 
 # I AM NOT DONE

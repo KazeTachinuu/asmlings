@@ -12,7 +12,6 @@
 #
 # YOUR TASK: Write a function 'set_value' that puts 66 in %rdi.
 #
-# Expected exit code: 66
 # ======================================
 
 # I AM NOT DONE

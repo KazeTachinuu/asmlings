@@ -16,7 +16,6 @@
 # YOUR TASK: Calculate 5 * 8 using a left shift.
 #            Hint: 8 = 2^3, so shift by 3.
 #
-# Expected exit code: 40
 # ======================================
 
 # I AM NOT DONE

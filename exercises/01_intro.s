@@ -12,8 +12,8 @@
 #
 # If you can't answer these, read the hint: ./asmlings hint 01
 #
-# Expected exit code: 0
 # ======================================
+
 
 # I AM NOT DONE
 

@@ -11,7 +11,6 @@
 #
 # YOUR TASK: Load the value stored at 'secret' into %rdi.
 #
-# Expected exit code: 42
 # ======================================
 
 # I AM NOT DONE

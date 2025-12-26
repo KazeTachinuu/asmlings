@@ -215,6 +215,9 @@ cmd_watch:
     cmp r13, STATE_WRONG_OUTPUT
     je .watch_ex_wrong_output
 
+    cmp r13, STATE_WRONG_PREDICT
+    je .watch_ex_wrong_predict
+
     # Compilation failed
     lea rdi, [rip + color_red]
     lea rsi, [rip + msg_failed]
@@ -252,16 +255,7 @@ cmd_watch:
     jmp .watch_show_progress
 
 .watch_ex_wrong_exit:
-    # Check if this is a predict exercise (don't reveal answer)
-    mov rdi, r14
-    call get_filename_ptr
-    mov rdi, rax
-    lea rsi, [rip + pattern_predict]
-    call str_find
-    test rax, rax
-    jnz .watch_ex_wrong_predict
-
-    # Normal exercise - show actual vs expected
+    # Show actual vs expected
     lea rdi, [rip + color_red]
     call print_str
     lea rdi, [rip + msg_wrong_exit]
@@ -524,9 +518,9 @@ cmd_run:
     test al, al
     jz .run_compile_failed
 
-    # Run with stdin passthrough (rsi=0 means don't redirect stdin)
+    # Run with stdin passthrough (rsi=-1 means keep stdin)
     xor edi, edi                    # no output capture
-    xor esi, esi                    # flags=0: keep stdin open
+    mov rsi, -1                     # -1 = stdin passthrough
     call run_exercise
     mov r12, rax                    # save exit code
 

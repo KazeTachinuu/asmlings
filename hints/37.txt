@@ -1,70 +1,38 @@
 ════════════════════════════════════════
-LESSON 37: Capstone - Implement strlen
+argc - Command Line Argument Count
 ════════════════════════════════════════
 
-C STRINGS
+THE STACK AT PROGRAM START
 
-In C, strings are sequences of bytes ending with a null terminator (0).
+When Linux runs your program, it places important data
+on the stack before calling _start:
 
-  "Hello" in memory:  'H' 'e' 'l' 'l' 'o' '\0'
-                       72  101 108 108 111  0
-
-The null terminator marks the end. To find length, count until you hit 0.
-
-
-THE ALGORITHM
-
-  length = 0
-  while (*ptr != 0):      # While byte at pointer is not null
-      length++            # Increment counter
-      ptr++               # Move to next byte
-  return length
+    ┌─────────────────┐  high addresses
+    │   env strings   │
+    │   arg strings   │
+    ├─────────────────┤
+    │      NULL       │  end of argv
+    │   argv[2] ptr   │  [rsp+24]
+    │   argv[1] ptr   │  [rsp+16]
+    │   argv[0] ptr   │  [rsp+8]
+    │     argc        │  [rsp]  ← stack pointer
+    └─────────────────┘  low addresses
 
 
-BYTE COMPARISON
+INDIRECT ADDRESSING
 
-  cmpb $0, (%rdi)
+(%rsp) means "the value AT the address in rsp"
 
-cmpb = compare BYTE (8-bit, not 64-bit!)
-(%rdi) = dereference: "the byte at address rdi"
+Think of it like this:
+  - %rsp contains an address (a number)
+  - (%rsp) says "go to that address and read what's there"
 
-This compares the byte pointed to by rdi with zero.
-
-
-INCREMENTING
-
-  incq %rax         # length++  (increment counter)
-  incq %rdi         # ptr++     (move to next byte)
+Compare:
+  movq %rsp, %rdi      # Copies the ADDRESS into rdi
+  movq (%rsp), %rdi    # Copies the VALUE at that address into rdi
 
 
-LOOP STRUCTURE
+THE KEY QUESTION
 
-  strlen_loop:
-      cmpb $0, (%rdi)     # Is current byte null?
-      je strlen_done      # If yes, we're done
-      incq %rax           # length++
-      incq %rdi           # ptr++
-      jmp strlen_loop     # Check next byte
-
-  strlen_done:
-      ret                 # Return length in %rax
-
-
-.ASCIZ VS .ASCII
-
-  .ascii "Hello"   # Just the bytes, NO null terminator
-  .asciz "Hello"   # Bytes WITH null terminator appended
-
-For strlen to work, the string MUST be null-terminated (.asciz).
-
-
-YOUR TASK
-
-Complete the strlen_loop body:
-  1. Compare byte at (%rdi) with 0
-  2. Jump to strlen_done if equal
-  3. Increment the length counter
-  4. Increment the pointer
-  5. Jump back to loop start
-
-"Hello" has 5 characters, so strlen returns 5.
+You need to get argc (which lives at address rsp) into %rdi.
+Which form do you need?

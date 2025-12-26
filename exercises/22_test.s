@@ -17,7 +17,6 @@
 # YOUR TASK: Check if %rdi is zero. If zero, exit with 1. Else exit with 0.
 #            Use test, not cmp!
 #
-# Expected exit code: 1
 # ======================================
 
 # I AM NOT DONE

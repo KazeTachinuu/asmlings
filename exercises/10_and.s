@@ -8,16 +8,15 @@
 #
 # Common use: MASKING - keeping only certain bits.
 #
-#   Value:  0x1234 = 0001 0010 0011 0100
-#   Mask:   0x00FF = 0000 0000 1111 1111
-#   Result: 0x0034 = 0000 0000 0011 0100
+#   Value:  0xAB   = 1010 1011
+#   Mask:   0x0F   = 0000 1111
+#   Result: 0x0B   = 0000 1011
 #
-# The mask 0xFF keeps only the lowest 8 bits (one byte).
+# The mask 0x0F keeps only the lowest 4 bits (one nibble).
 #
-# YOUR TASK: Extract the low byte from 0x1234.
-#            0x34 in decimal = 52
+# YOUR TASK: Extract the low nibble (4 bits) from 0xAB.
+#            0x0B in decimal = 11
 #
-# Expected exit code: 52
 # ======================================
 
 # I AM NOT DONE
@@ -26,9 +25,9 @@
 .text
 
 _start:
-    movq $0x1234, %rdi
+    movq $0xAB, %rdi
 
-    # YOUR CODE HERE: AND with 0xFF to keep only low byte
+    # YOUR CODE HERE: AND with 0x0F to keep only low nibble
 
 
     movq $60, %rax

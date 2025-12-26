@@ -11,7 +11,6 @@
 # YOUR TASK: The caller has 73 in %rbx. Our function clobbers %rbx.
 #            Save it before clobbering, restore before returning.
 #
-# Expected exit code: 73
 # ======================================
 
 # I AM NOT DONE

@@ -1,23 +1,25 @@
 # ======================================
-# Exercise 30: Stack Frames - The Standard Prologue/Epilogue
+# Exercise 30: Setting Up a Stack Frame
 # ======================================
 #
-# Every proper function should set up a "stack frame":
+# A proper function needs a "stack frame" - a dedicated
+# region of stack memory for that function's use.
 #
-# PROLOGUE (at start):
-#   pushq %rbp          # Save caller's base pointer
-#   movq %rsp, %rbp     # Set our base pointer to current stack
+# THE PROLOGUE (function start):
+#   pushq %rbp          # Save caller's frame pointer
+#   movq %rsp, %rbp     # Establish our frame pointer
 #
-# EPILOGUE (before return):
-#   popq %rbp           # Restore caller's base pointer
+# THE EPILOGUE (before return):
+#   popq %rbp           # Restore caller's frame pointer
 #   ret
 #
-# Why? %rbp gives us a stable reference point for local variables
-# and function arguments, even as %rsp changes.
+# Why save %rbp? The caller might be using it too!
+# Each function saves the old value, uses %rbp for itself,
+# then restores it before returning.
 #
-# YOUR TASK: Add the prologue and epilogue to my_func.
+# YOUR TASK: Add the prologue and epilogue to make this
+#            function work correctly.
 #
-# Expected exit code: 88
 # ======================================
 
 # I AM NOT DONE
@@ -26,17 +28,24 @@
 .text
 
 _start:
+    movq $73, %rbp          # Caller has important value in %rbp
+
     call my_func
+
+    movq %rbp, %rdi         # Caller expects %rbp unchanged!
     movq $60, %rax
     syscall
 
 my_func:
-    # YOUR CODE HERE: Add prologue
+    # YOUR CODE HERE: Prologue (2 instructions)
+    # 1. Save caller's %rbp
+    # 2. Set up our own %rbp
 
 
-    movq $88, %rdi          # Function body
+    # Function body - we use %rbp for our own purposes
+    movq $999, %rbp
 
-    # YOUR CODE HERE: Add epilogue (before ret)
+    # YOUR CODE HERE: Epilogue (2 instructions)
+    # 1. Restore caller's %rbp
+    # 2. Return
 
-
-    ret

@@ -1,5 +1,54 @@
 .section .text
 
+# Create test file if F directive was parsed
+# Returns: 1 on success, 0 on failure
+create_test_file:
+    movzx eax, byte ptr [rip + test_has_file]
+    test al, al
+    jz .ctf_no_file
+
+    # Create/truncate file
+    mov rax, SYS_OPEN
+    lea rdi, [rip + test_file_path]
+    mov rsi, 0x241                  # O_WRONLY | O_CREAT | O_TRUNC
+    mov rdx, 0644                   # permissions
+    syscall
+    test rax, rax
+    js .ctf_fail
+    mov r12, rax                    # fd
+
+    # Write content
+    mov rax, SYS_WRITE
+    mov rdi, r12
+    lea rsi, [rip + test_file_content]
+    mov rdx, [rip + test_file_len]
+    syscall
+
+    # Close
+    mov rax, SYS_CLOSE
+    mov rdi, r12
+    syscall
+
+.ctf_no_file:
+    mov eax, 1
+    ret
+.ctf_fail:
+    xor eax, eax
+    ret
+
+# Cleanup test file if C directive was parsed
+cleanup_test_file:
+    movzx eax, byte ptr [rip + test_has_cleanup]
+    test al, al
+    jz .clf_done
+
+    mov rax, 87                     # SYS_UNLINK
+    lea rdi, [rip + test_cleanup_path]
+    syscall
+
+.clf_done:
+    ret
+
 # Check if file contains "I AM NOT DONE" marker
 # rdi = path
 # Returns: 1 if found (not done), 0 if not found (done)
@@ -66,38 +115,52 @@ check_exercise:
     push rbx
     mov r12, rdi
 
-    # Check for marker first
+    # Load source file first (needed for both marker check and prediction)
     mov rdi, r12
-    call file_has_marker
+    call file_has_marker            # loads source into source_buffer
+    mov r13d, eax                   # save marker result
+
+    # Load expected file
+    mov rdi, r12
+    call load_expected_file
     test al, al
+    jz .check_failed                # expected file not found
+
+    # Check if prediction exercise
+    movzx eax, byte ptr [rip + test_is_predict]
+    test al, al
+    jnz .check_prediction
+
+    # Regular exercise: check for "I AM NOT DONE" marker
+    test r13d, r13d
     jnz .check_not_done
 
-    # Get expected exit code (parses from source_buffer loaded by file_has_marker)
-    mov rdi, r12
-    call get_expected_exit
-    mov r14d, eax
-
-    # Check if expected is 256 (means "???" prediction not filled)
-    cmp r14d, 256
-    je .check_not_done
-
-    # Get expected output (if any)
-    call get_expected_output
-    mov r15, rax                    # r15 = expected output length (0 if none)
-
-    # Compile
+    # Regular exercise - compile and run
     mov rdi, r12
     call compile_exercise
     test al, al
     jz .check_failed
 
-    # Run (captures stdout if r15 > 0, stdin redirected to /dev/null)
-    mov rdi, r15
-    mov rsi, 1                      # flags: redirect stdin to /dev/null
+    # Create test file if needed (F directive)
+    call create_test_file
+    test al, al
+    jz .check_failed
+
+    # Get expected output and input lengths
+    mov r15, [rip + expected_out_len]   # r15 = expected output length
+    mov rbx, [rip + expected_in_len]    # rbx = expected input length
+
+    # Run exercise
+    mov rdi, r15                    # expected output length
+    mov rsi, rbx                    # expected input length
     call run_exercise
-    mov r13, rax                    # r13 = exit code
+    mov r13, rax                    # r13 = actual exit code
+
+    # Cleanup test file if needed (C directive)
+    call cleanup_test_file
 
     # Compare exit codes
+    mov r14d, [rip + test_exit_code]
     cmp r13d, r14d
     jne .check_wrong_exit
 
@@ -121,12 +184,32 @@ check_exercise:
     mov eax, STATE_PASSED
     jmp .check_done
 
+.check_prediction:
+    # Get student's prediction from source file
+    call get_student_prediction
+    cmp eax, 256
+    je .check_not_done              # "???" not filled in yet
+
+    # Compare with expected answer
+    mov r13d, eax                   # student's prediction
+    mov r14d, [rip + test_predict_ans]
+    cmp r13d, r14d
+    jne .check_wrong_predict
+
+    mov eax, STATE_PASSED
+    jmp .check_done
+
+.check_wrong_predict:
+    mov eax, STATE_WRONG_PREDICT
+    jmp .check_done
+
 .check_wrong_output:
     mov eax, STATE_WRONG_OUTPUT
     jmp .check_done
 
 .check_wrong_exit:
     mov [rip + last_exit_actual], r13
+    movsx r14, r14d
     mov [rip + last_exit_expected], r14
     mov eax, STATE_WRONG_EXIT
     jmp .check_done
@@ -144,79 +227,6 @@ check_exercise:
     pop r14
     pop r13
     pop r12
-    ret
-
-# Get expected output from source file
-# Parses "Expected output: "xxx"" from source_buffer
-# Returns: length of expected output in rax (0 if none), output stored in expected_output
-get_expected_output:
-    push rbx
-    push r12
-
-    # Clear expected output length
-    mov qword ptr [rip + expected_out_len], 0
-
-    # Search for "Expected output:" in source_buffer
-    lea rdi, [rip + source_buffer]
-    lea rsi, [rip + marker_output]
-    call str_find
-    test rax, rax
-    jz .geo_not_found
-
-    # Found it - skip past the prefix (16 chars: "Expected output:")
-    add rax, 16
-    mov rbx, rax
-
-    # Skip whitespace
-.geo_skip_ws:
-    movzx ecx, byte ptr [rbx]
-    cmp cl, ' '
-    je .geo_next_ws
-    cmp cl, '\t'
-    je .geo_next_ws
-    jmp .geo_find_quote
-
-.geo_next_ws:
-    inc rbx
-    jmp .geo_skip_ws
-
-.geo_find_quote:
-    # Look for opening quote
-    cmp byte ptr [rbx], '"'
-    jne .geo_not_found
-    inc rbx                         # skip opening quote
-
-    # Copy until closing quote
-    lea rdi, [rip + expected_output]
-    xor r12, r12                    # length counter
-
-.geo_copy_loop:
-    movzx eax, byte ptr [rbx]
-    cmp al, '"'
-    je .geo_done_copy
-    cmp al, 0
-    je .geo_done_copy
-    cmp al, 10                      # newline
-    je .geo_done_copy
-    cmp r12, OUTPUT_MAX_LEN         # max length
-    jge .geo_done_copy
-    mov [rdi + r12], al
-    inc r12
-    inc rbx
-    jmp .geo_copy_loop
-
-.geo_done_copy:
-    mov byte ptr [rdi + r12], 0     # null terminate
-    mov [rip + expected_out_len], r12
-    mov rax, r12
-    jmp .geo_done
-
-.geo_not_found:
-    xor eax, eax
-
-.geo_done:
-    pop r12
-    pop rbx
     ret
 
 # Compile exercise (AT&T syntax only)
@@ -327,31 +337,43 @@ compile_exercise:
     pop rbx
     ret
 
-# Run compiled exercise with optional stdout capture
+# Run compiled exercise with optional stdout capture and stdin input
 # rdi = expected output length (0 = don't capture, >0 = capture)
-# rsi = flags: bit 0 = redirect stdin to /dev/null (for non-interactive mode)
+# rsi = expected input length (0 = redirect stdin to /dev/null, >0 = pipe input, -1 = passthrough)
 # Returns: exit code in eax, actual output in actual_output buffer
 run_exercise:
     push r12
     push r13
+    push r14
     push r15
-    sub rsp, 24                     # pipe fds [rsp], status [rsp+8]
+    sub rsp, 32                     # out pipe [rsp], in pipe [rsp+8], status [rsp+16]
 
-    mov r15, rdi                    # save expected length
-    mov r13, rsi                    # save flags
+    mov r15, rdi                    # save expected output length
+    mov r13, rsi                    # save expected input length
     mov qword ptr [rip + actual_out_len], 0
 
-    # If we need to capture output, create a pipe
+    # If we need to capture output, create output pipe
     test r15, r15
-    jz .run_no_pipe
+    jz .run_no_out_pipe
 
     mov rax, SYS_PIPE
-    lea rdi, [rsp]                  # pipe fds: [rsp]=read, [rsp+4]=write
+    lea rdi, [rsp]                  # out pipe fds: [rsp]=read, [rsp+4]=write
     syscall
     test rax, rax
     js .run_error
 
-.run_no_pipe:
+.run_no_out_pipe:
+    # If we have expected input, create input pipe
+    test r13, r13
+    jz .run_no_in_pipe
+
+    mov rax, SYS_PIPE
+    lea rdi, [rsp + 8]              # in pipe fds: [rsp+8]=read, [rsp+12]=write
+    syscall
+    test rax, rax
+    js .run_error
+
+.run_no_in_pipe:
     mov rax, SYS_FORK
     syscall
     test rax, rax
@@ -361,11 +383,29 @@ run_exercise:
 
     # ===== CHILD PROCESS =====
 
-    # Redirect stdin to /dev/null if flag is set (prevents blocking on read)
-    test r13, 1
-    jz .run_child_stdout
+    # Handle stdin: passthrough (-1), /dev/null (0), or pipe (>0)
+    cmp r13, -1
+    je .run_child_stdout              # passthrough: don't touch stdin
+    test r13, r13
+    jz .run_child_stdin_null
 
-    # Open /dev/null for reading
+    # Redirect stdin from input pipe read end
+    mov rax, SYS_CLOSE
+    mov edi, [rsp + 12]             # close write end
+    syscall
+
+    mov rax, SYS_DUP2
+    mov edi, [rsp + 8]              # input pipe read end
+    xor esi, esi                    # fd 0 = stdin
+    syscall
+
+    mov rax, SYS_CLOSE
+    mov edi, [rsp + 8]              # close original read fd
+    syscall
+    jmp .run_child_stdout
+
+.run_child_stdin_null:
+    # Redirect stdin to /dev/null
     mov rax, SYS_OPEN
     lea rdi, [rip + dev_null]
     xor esi, esi                    # O_RDONLY
@@ -374,14 +414,12 @@ run_exercise:
     test rax, rax
     js .run_child_stdout            # skip on error
 
-    # dup2(null_fd, stdin)
     mov rdi, rax                    # null_fd
     push rdi
     xor esi, esi                    # fd 0 = stdin
     mov rax, SYS_DUP2
     syscall
 
-    # Close original /dev/null fd
     pop rdi
     mov rax, SYS_CLOSE
     syscall
@@ -408,13 +446,40 @@ run_exercise:
     syscall
 
 .run_child_exec:
-    lea rdi, [rip + tmp_exe]
-    sub rsp, 16
+    # Build argv array: [tmp_exe, arg1, arg2, ..., NULL]
+    # Reserve space for: program path + up to 8 args + NULL = 10 * 8 = 80 bytes
+    sub rsp, 80
     lea rax, [rip + tmp_exe]
-    mov [rsp], rax
-    mov qword ptr [rsp + 8], 0
-    mov rsi, rsp
-    xor rdx, rdx
+    mov [rsp], rax                  # argv[0] = program path
+
+    # Copy argument pointers if any
+    mov ecx, [rip + test_args_count]
+    test ecx, ecx
+    jz .run_no_args
+
+    lea rsi, [rip + test_args_ptrs]
+    mov rdi, rsp
+    add rdi, 8                      # start at argv[1]
+    xor eax, eax
+.run_copy_args:
+    cmp eax, ecx
+    jge .run_args_done
+    mov r8, [rsi + rax*8]           # get arg pointer
+    mov [rdi + rax*8], r8           # store in argv
+    inc eax
+    jmp .run_copy_args
+.run_args_done:
+    # NULL terminate after last arg
+    mov qword ptr [rdi + rax*8], 0
+    jmp .run_do_exec
+
+.run_no_args:
+    mov qword ptr [rsp + 8], 0      # argv[1] = NULL
+
+.run_do_exec:
+    lea rdi, [rip + tmp_exe]
+    mov rsi, rsp                    # argv
+    xor rdx, rdx                    # envp = NULL
     mov rax, SYS_EXECVE
     syscall
     mov rax, SYS_EXIT
@@ -423,18 +488,40 @@ run_exercise:
 
     # ===== PARENT PROCESS =====
 .run_parent:
-    # If capturing, close write end and read from pipe
+    # If we have expected input, write it to input pipe
+    test r13, r13
+    jz .run_parent_no_input
+
+    # Close input pipe read end (child uses it)
+    mov rax, SYS_CLOSE
+    mov edi, [rsp + 8]
+    syscall
+
+    # Write expected input to input pipe
+    mov rax, SYS_WRITE
+    mov edi, [rsp + 12]             # input pipe write fd
+    lea rsi, [rip + expected_input]
+    mov rdx, r13                    # input length
+    syscall
+
+    # Close input pipe write end (signals EOF to child)
+    mov rax, SYS_CLOSE
+    mov edi, [rsp + 12]
+    syscall
+
+.run_parent_no_input:
+    # If capturing output, close write end and read from pipe
     test r15, r15
     jz .run_wait
 
-    # Close pipe write end
+    # Close output pipe write end
     mov rax, SYS_CLOSE
     mov edi, [rsp + 4]
     syscall
 
     # Read output from pipe
     mov rax, SYS_READ
-    mov edi, [rsp]                  # pipe read fd
+    mov edi, [rsp]                  # output pipe read fd
     lea rsi, [rip + actual_output]
     mov rdx, OUTPUT_MAX_LEN         # max bytes
     syscall
@@ -443,7 +530,7 @@ run_exercise:
     mov [rip + actual_out_len], rax
 
 .run_read_done:
-    # Close pipe read end
+    # Close output pipe read end
     mov rax, SYS_CLOSE
     mov edi, [rsp]
     syscall
@@ -451,12 +538,12 @@ run_exercise:
 .run_wait:
     mov rax, SYS_WAIT4
     mov rdi, r12
-    lea rsi, [rsp + 8]
+    lea rsi, [rsp + 16]             # status at new offset
     xor rdx, rdx
     xor r10, r10
     syscall
 
-    mov eax, [rsp + 8]
+    mov eax, [rsp + 16]             # status at new offset
     shr eax, 8
     and eax, 0xff
     jmp .run_done
@@ -465,8 +552,9 @@ run_exercise:
     mov rax, -1
 
 .run_done:
-    add rsp, 24
+    add rsp, 32
     pop r15
+    pop r14
     pop r13
     pop r12
     ret

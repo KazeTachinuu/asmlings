@@ -10,7 +10,6 @@
 #   - What happens when %rcx becomes 0?
 #   - Does the loop ever stop?
 #
-# Expected exit code: 0
 # ======================================
 
 # I AM NOT DONE
@@ -31,4 +30,3 @@ done:
     movq $60, %rax
     syscall
 
-# The bug is subtle but devastating. What should happen after the loop?

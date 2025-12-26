@@ -1,43 +1,37 @@
 ════════════════════════════════════════
-LESSON 17: Storing Data to Memory
+swap - Exchanging Values in Memory
 ════════════════════════════════════════
 
-STORING TO MEMORY
+THE SWAP PROBLEM
 
-To store a register value to a memory location:
+You can't directly move memory to memory. You need to go
+through registers. But if you just do:
 
-  movq %rax, label(%rip)
+  movq a, %rax
+  movq b, %rax    # Oops! Lost the original value of a
 
-This writes the value in %rax to the memory at 'label'.
-
-
-LOAD vs STORE
-
-  movq label(%rip), %rax    # LOAD:  memory → register
-  movq %rax, label(%rip)    # STORE: register → memory
-
-The direction is determined by which operand is memory.
+You've overwritten the first value.
 
 
-THE .DATA SECTION
+THE SOLUTION: TEMPORARY STORAGE
 
-Variables in .data are read-write. You can modify them.
+Use TWO registers:
 
-  .section .data
-  result: .quad 0           # Starts at 0, can be changed
-
-
-STORE THEN LOAD
-
-A common pattern is to compute something, store it, then load it back later.
-This exercise demonstrates that pattern (even though it's redundant here).
+  1. Load both values into registers
+  2. Store them back in swapped positions
 
 
-YOUR TASK
+STEP BY STEP
 
-1. Store %rax (which contains 77) to 'result'
-2. Load 'result' back into %rdi
+  movq a(%rip), %rax    # temp1 = a (10)
+  movq b(%rip), %rbx    # temp2 = b (20)
+  movq %rbx, a(%rip)    # a = temp2 (now 20)
+  movq %rax, b(%rip)    # b = temp1 (now 10)
 
-Two instructions:
-  movq %SOURCE, label(%rip)     # Store
-  movq label(%rip), %DEST       # Load
+After this: a=20, b=10
+
+
+THE KEY INSIGHT
+
+Registers are temporary storage. Load values into them,
+then write them back in the order you need.

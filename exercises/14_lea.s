@@ -19,7 +19,6 @@
 # YOUR TASK: Multiply %rdi by 5 using a single LEA instruction.
 #            Start value: 9.  Expected result: 45.
 #
-# Expected exit code: 45
 # ======================================
 
 # I AM NOT DONE

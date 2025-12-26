@@ -13,7 +13,6 @@
 #   1. Set up arguments for add(25, 19)
 #   2. Complete the add function to return the sum
 #
-# Expected exit code: 44
 # ======================================
 
 # I AM NOT DONE

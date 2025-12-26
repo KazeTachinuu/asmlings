@@ -6,6 +6,9 @@ SRCS = asmlings.s \
        src/strings.s \
        src/print.s \
        src/exercises.s \
+       src/check.s \
+       src/expected.s \
+       src/hints.s \
        src/commands.s \
        src/main.s
 

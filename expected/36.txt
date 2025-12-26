@@ -1,0 +1,4 @@
+# echo: read then write
+X 0
+I Hello
+O Hello

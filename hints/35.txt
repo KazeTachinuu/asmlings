@@ -1,69 +1,47 @@
 ════════════════════════════════════════
-LESSON 35: sys_read - Read from Input
+read_count - Reading Input
 ════════════════════════════════════════
 
 THE READ SYSCALL
 
-Syscall number: 0 (goes in %rax)
+  movq $0, %rax         # syscall number (read = 0)
+  movq $0, %rdi         # file descriptor (stdin = 0)
+  movq $???, %rsi       # pointer to buffer
+  movq $???, %rdx       # max bytes to read
+  syscall
 
-Arguments:
-  %rdi = file descriptor (0 = stdin for keyboard input)
-  %rsi = pointer to buffer (where to store data)
-  %rdx = maximum bytes to read
-
-Returns: number of bytes actually read (in %rax)
-
-
-WHY "MAXIMUM BYTES"?
-
-read() is not guaranteed to read that many bytes.
-It reads UP TO that amount, or until end of input.
-
-The return value tells you how many bytes were actually read.
-This is crucial for knowing how much valid data you have!
+After syscall, %rax contains bytes actually read.
 
 
 THE .BSS SECTION
 
+The buffer is in .bss - uninitialized data. This reserves
+memory at runtime without taking space in the executable.
+
   .section .bss
-  buffer: .skip 64
+  buffer: .skip 256     # Reserve 256 bytes
 
-.bss is for uninitialized data. It reserves space without
-taking up room in the executable. Perfect for input buffers.
-
-.skip 64 reserves 64 bytes.
-
-
-THE .RODATA SECTION
-
-  .section .rodata
-  msg: .ascii "Hello"
-
-.rodata is for read-only data like string constants.
-The assembler includes this data in the executable.
-
-
-RIP-RELATIVE ADDRESSING
+To get the address of buffer:
 
   leaq buffer(%rip), %rsi
 
-This loads the address of 'buffer' into %rsi.
-%rip is the instruction pointer - this is position-independent code.
 
+USING THE RETURN VALUE
 
-READING INPUT
+The exit syscall needs the exit code in %rdi.
+But read returns the byte count in %rax.
 
-  echo "hello" | ./program
+The exercise already has:
+  movq %rax, %rdi       # Move byte count to exit code
+  movq $60, %rax        # syscall number for exit
 
-The "hello" (5 bytes) plus newline (1 byte) = 6 bytes.
-read() returns 6, which becomes the exit code.
+So you just need to implement the read syscall above.
 
 
 YOUR TASK
 
-This exercise is already complete! Study how:
-  - .bss reserves buffer space
-  - read syscall is set up
-  - Return value (%rax) is used as exit code
-
-Then remove the marker.
+Set up the four values and call syscall:
+  - %rax = 0 (read)
+  - %rdi = 0 (stdin)
+  - %rsi = address of buffer
+  - %rdx = 256 (buffer size)

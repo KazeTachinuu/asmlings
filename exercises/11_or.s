@@ -14,7 +14,6 @@
 #
 # YOUR TASK: Combine 0x30 and 0x05 using OR.
 #
-# Expected exit code: 53
 # ======================================
 
 # I AM NOT DONE

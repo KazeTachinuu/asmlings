@@ -1,0 +1,2 @@
+# strlen: "Hello" has 5 characters
+X 5

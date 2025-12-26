@@ -14,7 +14,6 @@
 # YOUR TASK: Sum all elements in the 'numbers' array.
 #            numbers = {10, 20, 15, 5}  ->  sum = 50
 #
-# Expected exit code: 50
 # ======================================
 
 # I AM NOT DONE

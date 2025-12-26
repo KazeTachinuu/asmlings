@@ -37,6 +37,7 @@
 .equ STATE_FAILED,          2
 .equ STATE_WRONG_EXIT,      3
 .equ STATE_WRONG_OUTPUT,    4
+.equ STATE_WRONG_PREDICT,   5
 
 # Syscalls for pipes
 .equ SYS_PIPE,              22

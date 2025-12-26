@@ -1,0 +1,5 @@
+X 0
+F multi.txt:Line1\nLine2\nLine3
+A multi.txt
+O Line1\nLine2\nLine3
+C multi.txt

@@ -1,0 +1,4 @@
+# greet: print "Hello, <name>"
+A World
+O Hello, World
+X 0

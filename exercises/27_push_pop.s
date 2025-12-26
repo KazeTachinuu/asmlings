@@ -17,7 +17,6 @@
 #   [42]  <- older (pushed first)
 #   [99]  <- top (pushed last, RSP points here)
 #
-# Expected exit code: 42
 # ======================================
 
 # I AM NOT DONE

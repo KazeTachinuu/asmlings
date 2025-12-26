@@ -6,7 +6,7 @@ TESTDIR="/tmp/asmlings_test_$$"
 # Setup test environment
 test_setup() {
     rm -rf "$TESTDIR"
-    mkdir -p "$TESTDIR/exercises" "$TESTDIR/hints"
+    mkdir -p "$TESTDIR/exercises" "$TESTDIR/hints" "$TESTDIR/expected"
     cp ./asmlings "$TESTDIR/"
 }
 
@@ -20,48 +20,67 @@ asmlings() {
     (cd "$TESTDIR" && timeout 2 ./asmlings "$@" 2>&1) </dev/null
 }
 
-# Create exercise from fixture
-# Usage: exercise NAME FIXTURE [MARKER] [EXIT_CODE]
-exercise() {
-    local name="$1" fixture="$2" marker="${3:-1}" exit_code="${4:-0}"
-    local dest="$TESTDIR/exercises/$name"
+# Load a test case from fixtures
+# Usage: load_fixture EXERCISE_FIXTURE EXPECTED_FIXTURE [EXERCISE_NUM]
+# Example: load_fixture exit0 exit0 01
+load_fixture() {
+    local exercise="$1"
+    local expected="$2"
+    local num="${3:-01}"
 
-    : > "$dest"
-    [[ "$marker" == 1 ]] && echo "# I AM NOT DONE" >> "$dest"
-    echo "# Expected exit code: $exit_code" >> "$dest"
-    cat "$FIXTURES/$fixture" >> "$dest"
+    cp "$FIXTURES/exercises/${exercise}.s" "$TESTDIR/exercises/${num}_test.s"
+    cp "$FIXTURES/expected/${expected}.txt" "$TESTDIR/expected/${num}.txt"
 }
 
-# Create exercise with expected output
-# Usage: exercise_output NAME FIXTURE EXPECTED_OUTPUT
-exercise_output() {
-    local name="$1" fixture="$2" expected="$3"
-    local dest="$TESTDIR/exercises/$name"
+# Load exercise with custom expected file content
+# Usage: load_exercise EXERCISE_FIXTURE EXPECTED_CONTENT [EXERCISE_NUM]
+load_exercise() {
+    local exercise="$1"
+    local expected_content="$2"
+    local num="${3:-01}"
 
-    echo "# Expected output: \"$expected\"" > "$dest"
-    echo "# Expected exit code: 0" >> "$dest"
-    cat "$FIXTURES/$fixture" >> "$dest"
+    cp "$FIXTURES/exercises/${exercise}.s" "$TESTDIR/exercises/${num}_test.s"
+    echo -e "$expected_content" > "$TESTDIR/expected/${num}.txt"
 }
 
-# Create predict exercise (with ??? or specific value)
-# Usage: exercise_predict NAME FIXTURE PREDICTION
-exercise_predict() {
-    local name="$1" fixture="$2" prediction="$3"
-    local dest="$TESTDIR/exercises/$name"
+# Load multiple fixtures for multi-exercise tests
+# Usage: load_fixtures "exit0:exit0:01" "exit42:exit42:02"
+load_fixtures() {
+    for spec in "$@"; do
+        IFS=':' read -r exercise expected num <<< "$spec"
+        load_fixture "$exercise" "$expected" "$num"
+    done
+}
 
-    echo "# Expected exit code: $prediction" > "$dest"
-    cat "$FIXTURES/$fixture" >> "$dest"
+# Add marker to exercise file
+add_marker() {
+    local num="${1:-01}"
+    local file="$TESTDIR/exercises/${num}_test.s"
+    local tmp=$(mktemp)
+    echo "# I AM NOT DONE" > "$tmp"
+    cat "$file" >> "$tmp"
+    mv "$tmp" "$file"
+}
+
+# Set prediction in exercise file
+set_prediction() {
+    local value="$1"
+    local num="${2:-01}"
+    sed -i "s/Prediction: ???/Prediction: $value/" "$TESTDIR/exercises/${num}_test.s"
 }
 
 # Create hint file
 hint() {
-    echo "$2" > "$TESTDIR/hints/$1.txt"
+    local num="$1"
+    local content="$2"
+    echo "$content" > "$TESTDIR/hints/${num}.txt"
 }
 
 # Assert output contains string
 assert_contains() {
     [[ "$1" == *"$2"* ]] || {
-        echo "Expected '$1' to contain '$2'" >&2
+        echo "Expected output to contain '$2'" >&2
+        echo "Got: $1" >&2
         return 1
     }
 }
@@ -69,7 +88,23 @@ assert_contains() {
 # Assert output does not contain string
 assert_not_contains() {
     [[ "$1" != *"$2"* ]] || {
-        echo "Expected '$1' to NOT contain '$2'" >&2
+        echo "Expected output to NOT contain '$2'" >&2
+        return 1
+    }
+}
+
+# Assert file exists
+assert_file_exists() {
+    [[ -f "$1" ]] || {
+        echo "Expected file to exist: $1" >&2
+        return 1
+    }
+}
+
+# Assert file does not exist
+assert_file_not_exists() {
+    [[ ! -f "$1" ]] || {
+        echo "Expected file to NOT exist: $1" >&2
         return 1
     }
 }
