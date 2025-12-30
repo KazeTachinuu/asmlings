@@ -35,3 +35,21 @@ THE KEY INSIGHT
 
 Registers are temporary storage. Load values into them,
 then write them back in the order you need.
+
+
+BONUS: THE XOR SWAP TRICK
+
+You can swap two values without a temporary register using XOR:
+
+  xor %rax, %rbx    # rbx = rax ^ rbx
+  xor %rbx, %rax    # rax = rbx ^ rax (now original rbx)
+  xor %rax, %rbx    # rbx = rax ^ rbx (now original rax)
+
+How it works (with a=10, b=20):
+
+  b = a XOR b       # b = 30
+  a = a XOR b       # a = 20
+  b = a XOR b       # b = 10
+
+Three operations, no extra storage needed.
+
