@@ -2,6 +2,8 @@
 
 Learn x86-64 assembly by fixing small programs. Inspired by [rustlings](https://github.com/rust-lang/rustlings).
 
+![asmlings watch-mode demo](demo/asmlings.gif)
+
 **46 exercises** covering:
 - Basics (registers, arithmetic, logic)
 - Memory operations (load, store, addressing)
